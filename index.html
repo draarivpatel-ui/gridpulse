@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'" />
+  <title>GridPulse | ERCOT Peak-Load Shift Optimizer &amp; Sub-Panel Telemetry</title>
+  <meta name="description" content="Residential ERCOT peak-demand load-shift optimizer, 8-circuit breaker directory, 24-hour dual-curve oscilloscope, and 13.5 kWh LFP microgrid island endurance simulator." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2311161B'/%3E%3Cpath d='M5 20H11L14 9L18 23L21 15H27' fill='none' stroke='%230D7A5F' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='27' cy='15' r='2' fill='%23F4F2EB'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="instrument-header no-print">
+    <div class="container header-grid">
+      <div class="brand-unit">
+        <div class="brand-title-row">
+          <svg class="brand-glyph" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <rect x="1.5" y="1.5" width="25" height="25" rx="3" stroke="currentColor" stroke-width="1.75" />
+            <path d="M5 17.5H9.5L12.5 8.5L16 20.5L18.5 14H23" stroke="#0D7A5F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <h1 class="brand-name">GridPulse</h1>
+          <span class="bus-spec-tag tabular">ERCOT // 240V SPLIT-PHASE</span>
+        </div>
+        <p class="brand-subcopy">Household Peak-Load Shift Optimizer, Sub-Panel Telemetry &amp; 13.5 kWh LFP Island Simulator</p>
+      </div>
+
+      <div class="header-controls">
+        <div class="scenario-selector" role="group" aria-label="ERCOT Grid Weather and Reserve Scenario">
+          <button type="button" class="scenario-btn active" data-scenario-id="ercot-summer-peak" aria-pressed="true">
+            <span>Aug 104°F Peak</span>
+          </button>
+          <button type="button" class="scenario-btn" data-scenario-id="ercot-winter-freeze" aria-pressed="false">
+            <span>Feb Polar Freeze</span>
+          </button>
+          <button type="button" class="scenario-btn" data-scenario-id="ercot-coastal-calm" aria-pressed="false">
+            <span>Wind Drop Ramp</span>
+          </button>
+          <button type="button" class="scenario-btn" data-scenario-id="ercot-outage-island" aria-pressed="false">
+            <span>Outage Island (13.5 kWh)</span>
+          </button>
+        </div>
+
+        <button type="button" class="utility-print-btn" data-action="print-schedule">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9V2h12v7" />
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          <span>Print 1-Page Breaker Schedule</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-console no-print">
+    <!-- Hero Console: Asymmetrical 2-Column Industrial Brief + Master Relay Actions -->
+    <section class="console-brief-grid" aria-labelledby="console-headline">
+      <div class="brief-statement-col">
+        <h2 id="console-headline" class="console-display-title">
+          Shave feeder peak demand before <em class="editorial-serif">simple-cycle gas peakers</em> &amp; rolling load-shed relays trip.
+        </h2>
+        <p id="scenario-summary" class="brief-lead">
+          Stagnant high-pressure heat dome pushes afternoon ambient temperatures to 104°F while thermal generation derates and evening AC load spikes across ERCOT.
+        </p>
+        <figure class="hardware-specimen-figure">
+          <img
+            src="./img/gridpulse-hero.jpg"
+            alt="Dieter Rams inspired GridPulse residential sub-panel load controller showing exposed copper bus bars, mechanical breaker toggles, and an LED strain arc gauge on limestone"
+            width="960"
+            height="540"
+            loading="eager"
+            fetchpriority="high"
+            class="hardware-specimen-img"
+          />
+          <figcaption class="hardware-specimen-caption tabular">
+            <span>FIG 01 // 240V SPLIT-PHASE COPPER BUS &amp; SOLID-STATE PEAK-SHIFT RELAY MODULE</span>
+            <span>CT CLAMP ACCURACY: +/-0.5%</span>
+          </figcaption>
+        </figure>
+        <div class="guidance-callout">
+          <svg class="callout-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4" />
+            <path d="M12 16h.01" />
+          </svg>
+          <p id="scenario-guidance" class="guidance-copy">
+            Pre-cool thermal mass between 13:00 and 15:30, defer 40A EV charging to 01:00 wind surplus, and lock out resistive dryer drums during 16:00 - 20:00.
+          </p>
+        </div>
+      </div>
+
+      <aside class="scenario-instrument-well" aria-labelledby="active-condition-heading">
+        <div class="well-header-bar">
+          <h3 id="active-condition-heading" class="well-title" data-bind="scenario-title">
+            <span id="scenario-title">August 104°F Thermal Peak</span>
+          </h3>
+          <span id="scenario-alert-code" class="alert-code-pill tabular">ERCOT EEA-1 WATCH</span>
+        </div>
+
+        <dl class="telemetry-spec-grid tabular">
+          <div class="spec-cell">
+            <dt>Ambient Peak</dt>
+            <dd id="scenario-ambient">104°F</dd>
+          </div>
+          <div class="spec-cell">
+            <dt>ERCOT Reserve</dt>
+            <dd id="scenario-reserve">4.2%</dd>
+          </div>
+          <div class="spec-cell">
+            <dt>Emergency Window</dt>
+            <dd id="scenario-peak-window">16:00 - 20:00</dd>
+          </div>
+          <div class="spec-cell">
+            <dt>Tariff Spread</dt>
+            <dd id="scenario-tariffs">$0.32/kWh peak / $0.09/kWh off-peak</dd>
+          </div>
+          <div class="spec-cell spec-cell-wide">
+            <dt>Marginal Peaker Carbon Intensity</dt>
+            <dd id="scenario-carbon">0.62 kg CO2/kWh</dd>
+          </div>
+        </dl>
+
+        <div class="master-relay-deck">
+          <button type="button" class="primary-actuator-btn" data-action="auto-optimize" id="auto-optimize-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+            <span>One-Tap Auto-Optimize Peak Shift</span>
+          </button>
+          <div class="secondary-relay-row">
+            <button type="button" class="sub-actuator-btn" data-action="island-critical-only" id="island-critical-btn">
+              <span>Shed to Critical Bus Only</span>
+            </button>
+            <button type="button" class="sub-actuator-btn" data-action="reset-baseline" id="reset-baseline-btn">
+              <span>Restore Unshifted Baseline</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- 4-Channel Industrial Telemetry Readout Strip (Asymmetrical 4-Column Instrument Rail) -->
+    <section class="telemetry-readout-rail" aria-label="Calculated Household and Grid Impact Telemetry">
+      <div class="readout-module readout-primary">
+        <div class="readout-head">
+          <h3 class="readout-title">Peak Window Demand Reduction</h3>
+          <span id="metric-peak-pct" class="readout-badge badge-emerald tabular">0.0% shaved</span>
+        </div>
+        <p id="metric-peak-shaved" class="readout-value tabular">-0.00 kW</p>
+        <p id="metric-peak-comparison" class="readout-sub tabular">19.65 kW baseline to 19.65 kW active</p>
+      </div>
+
+      <div class="readout-module">
+        <div class="readout-head">
+          <h3 class="readout-title">Time-of-Use Bill Arbitrage</h3>
+        </div>
+        <p id="metric-daily-savings" class="readout-value tabular">$0.00</p>
+        <p id="metric-monthly-savings" class="readout-sub tabular">$0.00 / 30d</p>
+      </div>
+
+      <div class="readout-module">
+        <div class="readout-head">
+          <h3 class="readout-title">Marginal Peaker CO2 Avoided</h3>
+        </div>
+        <p id="metric-daily-carbon" class="readout-value tabular">0.00 kg</p>
+        <p id="metric-monthly-carbon" class="readout-sub tabular">0.0 kg / 30d</p>
+      </div>
+
+      <div class="readout-module">
+        <div class="readout-head">
+          <h3 class="readout-title">Feeder Strain Index</h3>
+        </div>
+        <p id="metric-strain-score" class="readout-value tabular">91 / 100</p>
+        <div class="strain-bar-track" aria-hidden="true">
+          <div id="strain-meter-fill" class="strain-bar-fill" data-tone="vermilion" style="width: 91%"></div>
+        </div>
+        <p id="metric-strain-label" class="readout-sub tabular">CRITICAL: Critical Feeder Overload Risk (Baseline 91)</p>
+      </div>
+    </section>
+
+    <!-- Primary Workbench: 24-Hour Oscilloscope + 13.5 kWh LFP Outage Island Simulator -->
+    <section class="oscilloscope-island-grid" aria-label="24-Hour Load Curve and Battery Backup Telemetry">
+      <div class="oscilloscope-panel">
+        <div class="panel-header-row">
+          <div>
+            <h2 class="section-heading">24-Hour Dual-Trace Demand Oscilloscope</h2>
+            <p class="section-subcopy">Compares unshifted household peak profile (vermilion dashed) against active breaker and relay schedule (emerald solid).</p>
+          </div>
+          <div class="trace-legend tabular">
+            <span class="legend-item"><span class="legend-swatch swatch-baseline"></span>Baseline Peak Curve</span>
+            <span class="legend-item"><span class="legend-swatch swatch-optimized"></span>Active Shifted Bus</span>
+            <span class="legend-item"><span class="legend-swatch swatch-window"></span>ERCOT Alert Window</span>
+          </div>
+        </div>
+
+        <div id="oscilloscope-stage" class="oscilloscope-stage"></div>
+
+        <div class="scrubber-console tabular">
+          <div class="scrubber-slider-col">
+            <label for="hour-scrubber-input" class="scrubber-label">
+              <span>Inspect Interval Cursor: <strong id="inspected-hour-val">18:00</strong></span>
+              <span id="inspected-window-tag" class="interval-tag">ERCOT PEAK INTERVAL</span>
+            </label>
+            <input
+              type="range"
+              id="hour-scrubber-input"
+              min="0"
+              max="23"
+              step="1"
+              value="18"
+              aria-label="Inspect hour of day from 00:00 to 23:00"
+            />
+          </div>
+
+          <div class="scrubber-readout-cells">
+            <div class="scrubber-cell">
+              <span class="cell-label">Baseline</span>
+              <strong id="inspected-baseline-kw">19.65 kW</strong>
+            </div>
+            <div class="scrubber-cell">
+              <span class="cell-label">Active Bus</span>
+              <strong id="inspected-optimized-kw" class="text-emerald">19.65 kW</strong>
+            </div>
+            <div class="scrubber-cell">
+              <span class="cell-label">Interval Delta</span>
+              <strong id="inspected-delta-kw">-0.00 kW</strong>
+            </div>
+            <div class="scrubber-cell">
+              <span class="cell-label">Interval Tariff</span>
+              <strong id="inspected-tariff-val">$0.32/kWh</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 13.5 kWh LFP Outage Island Simulator -->
+      <aside class="island-battery-panel" aria-labelledby="island-simulator-heading">
+        <div class="island-header">
+          <h2 id="island-simulator-heading" class="section-heading">13.5 kWh LFP Outage Reserve</h2>
+          <span id="outage-status-badge" class="status-pill status-unshifted">High Drain Warning (&lt;8h Backup)</span>
+        </div>
+        <p class="section-subcopy">
+          Simulates lithium iron phosphate (LFP) microgrid endurance (94% inverter efficiency, 10% reserve floor) under current breaker states.
+        </p>
+
+        <div class="battery-big-readout tabular">
+          <div class="endurance-clock">
+            <span class="clock-caption">Estimated Island Runtime</span>
+            <strong id="outage-duration-val" class="clock-digits">2h 20m</strong>
+          </div>
+          <div class="endurance-meta-list">
+            <span id="outage-usable-kwh">10.15 kWh usable</span>
+            <span id="outage-net-drain">4.35 kW net drain</span>
+          </div>
+        </div>
+
+        <div class="battery-control-block tabular">
+          <div class="soc-label-row">
+            <label for="battery-soc-slider">Battery State of Charge (SoC)</label>
+            <strong id="outage-soc-readout">90% SoC</strong>
+          </div>
+          <input
+            type="range"
+            id="battery-soc-slider"
+            min="20"
+            max="100"
+            step="5"
+            value="90"
+            aria-label="LFP Battery State of Charge Percentage"
+          />
+          <div class="soc-scale-ticks" aria-hidden="true">
+            <span>20%</span>
+            <span>40%</span>
+            <span>60%</span>
+            <span>80%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="toggle-solar-btn"
+          class="solar-toggle-btn is-active"
+          data-action="toggle-solar"
+          aria-pressed="true"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" />
+            <path d="M12 20v2" />
+            <path d="m4.93 4.93 1.41 1.41" />
+            <path d="m17.66 17.66 1.41 1.41" />
+            <path d="M2 12h2" />
+            <path d="M20 12h2" />
+            <path d="m6.34 17.66-1.41 1.41" />
+            <path d="m19.07 4.93-1.41 1.41" />
+          </svg>
+          <span id="solar-btn-text" class="tabular">Solar Offset Active (+1.4 kW peak)</span>
+        </button>
+
+        <div class="island-physics-note tabular">
+          <p><strong>Critical Bus Rule:</strong> Shedding 240V heating and EV circuits extends 13.5 kWh LFP runtime from ~2.5 hours to over 30 hours for medical CPAP, refrigeration, and gateway comms.</p>
+        </div>
+      </aside>
+    </section>
+
+    <!-- 8-Circuit Household Sub-Panel Breaker Directory -->
+    <section class="breaker-directory-section" aria-labelledby="breaker-directory-heading">
+      <div class="directory-header-bar">
+        <div>
+          <h2 id="breaker-directory-heading" class="section-heading">8-Circuit Sub-Panel Load Directory</h2>
+          <p class="section-subcopy">Throw individual 240V / 120V breakers or arm automated time-of-use peak-shift relays to clear the ERCOT alert window.</p>
+        </div>
+        <div class="directory-meta-right">
+          <span id="breaker-summary-counts" class="directory-count-pill tabular">8 Closed / 0 Shed / 0 Shifted</span>
+        </div>
+      </div>
+
+      <div id="breaker-directory-list" class="breaker-directory-list"></div>
+    </section>
+  </main>
+
+  <!-- 1-Page Printable Household Breaker & Peak-Shift Schedule (Visible in Print, Compact Preview on Screen) -->
+  <section class="print-schedule-sheet container" aria-labelledby="print-sheet-heading">
+    <div class="print-sheet-header">
+      <div>
+        <h2 id="print-sheet-heading" class="print-sheet-title">GridPulse Sub-Panel Breaker &amp; Peak-Shift Placard</h2>
+        <p class="print-sheet-sub">Post inside residential load-center door for ERCOT Energy Emergency Alert (EEA) &amp; outage island switching.</p>
+      </div>
+      <div class="print-sheet-metrics tabular">
+        <div><span>Scenario:</span> <strong id="print-scenario-name">August 104°F Thermal Peak (16:00 - 20:00)</strong></div>
+        <div><span>Peak Shaved:</span> <strong id="print-peak-reduction">-0.00 kW (0.0% shaved)</strong></div>
+        <div><span>Est. 30-Day Savings:</span> <strong id="print-monthly-savings">$0.00 / 30d</strong></div>
+        <div><span>13.5 kWh Island Runtime:</span> <strong id="print-outage-endurance">2h 20m @ 90% SoC</strong></div>
+      </div>
+    </div>
+
+    <div class="table-scroll-wrap">
+      <table class="placard-table">
+        <thead>
+          <tr>
+            <th scope="col">Slot / Breaker</th>
+            <th scope="col">Household Circuit Load</th>
+            <th scope="col">Rated kW</th>
+            <th scope="col">Baseline Peak Avg</th>
+            <th scope="col">Active Peak Avg</th>
+            <th scope="col">ERCOT Peak / Island Directive</th>
+          </tr>
+        </thead>
+        <tbody id="print-schedule-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="instrument-footer no-print">
+    <div class="container footer-grid">
+      <div class="footer-left">
+        <p><strong>GridPulse Residential Demand-Response &amp; Microgrid Console</strong> <span class="tabular">(v1.0.0)</span></p>
+        <p class="footer-tech-note tabular">Calibrated for ERCOT 15-minute settlement intervals, 240V split-phase residential load centers, and 13.5 kWh LFP backup storage.</p>
+      </div>
+      <div class="footer-right tabular">
+        <span>Zero External Runtime Dependencies</span>
+        <span>48 Automated Unit &amp; Mutation Checks</span>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

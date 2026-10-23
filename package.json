@@ -1,0 +1,19 @@
+{
+  "name": "gridpulse",
+  "version": "1.0.0",
+  "description": "GridPulse: ERCOT Peak-Load Shift Optimizer, Circuit Breaker Telemetry, and LFP Outage Island Simulator",
+  "type": "module",
+  "main": "js/gridpulse-engine.js",
+  "scripts": {
+    "test": "node --test tests/gridpulse.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/draarivpatel-ui/gridpulse.git"
+  },
+  "author": "Aariv Patel (draarivpatel-ui)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
