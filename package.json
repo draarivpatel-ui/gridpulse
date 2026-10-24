@@ -1,7 +1,7 @@
 {
   "name": "gridpulse",
   "version": "1.0.0",
-  "description": "GridPulse: ERCOT Peak-Load Shift Optimizer, Circuit Breaker Telemetry, and LFP Outage Island Simulator",
+  "description": "ERCOT household sub-panel load-shift calculator and 13.5 kWh LFP outage simulator",
   "type": "module",
   "main": "js/gridpulse-engine.js",
   "scripts": {
@@ -15,5 +15,6 @@
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "homepage": "https://aariv.me/gridpulse/"
 }
