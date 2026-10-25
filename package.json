@@ -5,13 +5,13 @@
   "type": "module",
   "main": "js/gridpulse-engine.js",
   "scripts": {
-    "test": "node --test tests/gridpulse.test.js"
+    "test": "node --test tests/gridpulse.test.js tests/dom-smoke.test.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/draarivpatel-ui/gridpulse.git"
   },
-  "author": "Aariv Patel (draarivpatel-ui)",
+  "author": "draarivpatel-ui",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"

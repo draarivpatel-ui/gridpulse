@@ -8,6 +8,13 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'" />
   <title>GridPulse | ERCOT Peak-Load Shift Optimizer &amp; Sub-Panel Telemetry</title>
   <meta name="description" content="Residential ERCOT peak-demand load-shift optimizer, 8-circuit breaker directory, 24-hour dual-curve oscilloscope, and 13.5 kWh LFP microgrid island endurance simulator." />
+  <meta property="og:title" content="GridPulse | ERCOT Peak-Load Shift Optimizer &amp; Sub-Panel Telemetry" />
+  <meta property="og:description" content="Residential ERCOT peak-demand load-shift optimizer, 8-circuit breaker directory, 24-hour dual-curve oscilloscope, and 13.5 kWh LFP microgrid island endurance simulator." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://aariv.me/gridpulse/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GridPulse | ERCOT Peak-Load Shift Optimizer &amp; Sub-Panel Telemetry" />
+  <meta name="twitter:description" content="Residential ERCOT peak-demand load-shift optimizer, 8-circuit breaker directory, 24-hour dual-curve oscilloscope, and 13.5 kWh LFP microgrid island endurance simulator." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2311161B'/%3E%3Cpath d='M5 20H11L14 9L18 23L21 15H27' fill='none' stroke='%230D7A5F' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='27' cy='15' r='2' fill='%23F4F2EB'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,6 +22,13 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+  <a class="skip-link" href="#main-console">Skip to main content</a>
+  <noscript>
+    <div class="noscript-banner" role="alert">
+      <strong>JavaScript Required for Interactive ERCOT Sub-Panel Telemetry:</strong> Enable JavaScript to run the 24-hour dual-trace demand oscilloscope, 8-circuit breaker directory, and 13.5 kWh LFP outage island simulator.
+    </div>
+  </noscript>
+
   <header class="instrument-header no-print">
     <div class="container header-grid">
       <div class="brand-unit">
@@ -57,7 +71,7 @@
     </div>
   </header>
 
-  <main class="container main-console no-print">
+  <main id="main-console" class="container main-console no-print">
     <!-- Hero Console: Asymmetrical 2-Column Industrial Brief + Master Relay Actions -->
     <section class="console-brief-grid" aria-labelledby="console-headline">
       <div class="brief-statement-col">
@@ -365,7 +379,7 @@
       </div>
       <div class="footer-right tabular">
         <span>Zero External Runtime Dependencies</span>
-        <span>48 Automated Unit &amp; Mutation Checks</span>
+        <span>68 Automated Unit &amp; DOM Smoke Checks</span>
       </div>
     </div>
   </footer>
