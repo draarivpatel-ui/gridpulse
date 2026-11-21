@@ -18,9 +18,9 @@
   --vermilion: #C92A2A;
   --vermilion-wash: #FDE2E2;
 
-  --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
   --shadow-soft: 0 2px 6px rgba(17, 22, 27, 0.05), 0 8px 20px rgba(17, 22, 27, 0.04);
@@ -820,6 +820,90 @@ input[type="range"] {
 
 .island-physics-note p {
   margin: 0;
+}
+
+/* Load-Shift Advisor: marginal contributions, greedy plan, stress test */
+.advisor-section {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-soft);
+}
+.advisor-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 200px));
+  gap: 0.4rem 1.25rem;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+.advisor-controls label { display: block; }
+.advisor-controls input[type="range"] { width: 100%; }
+.advisor-controls button { grid-column: 1 / -1; }
+.advisor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+.advisor-card {
+  background-color: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1.1rem;
+  min-width: 0;
+}
+.advisor-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+.advisor-subhead { margin-top: 1.5rem; }
+.tbl-scroll {
+  overflow-x: auto;
+}
+.advisor-lead {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0 0 0.9rem;
+  min-height: 2.4rem;
+}
+.advisor-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+.advisor-table caption {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  padding-bottom: 0.5rem;
+}
+.advisor-table th, .advisor-table td {
+  padding: 0.4rem 0.55rem;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+}
+.advisor-table th:first-child, .advisor-table td:first-child { text-align: left; white-space: normal; }
+.advisor-table th { font-size: 0.7rem; color: var(--muted); }
+.advisor-table td.positive { color: var(--emerald); font-weight: 700; }
+.advisor-table td.negative { color: var(--vermilion); font-weight: 700; }
+.advisor-plan-list {
+  margin: 0;
+  padding-left: 1.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.advisor-plan-list li { margin-bottom: 0.45rem; }
+.advisor-plan-list b { color: var(--ink); font-weight: 700; }
+@media (max-width: 720px) {
+  .advisor-controls { grid-template-columns: 1fr; }
 }
 
 /* 8-Circuit Breaker Directory */

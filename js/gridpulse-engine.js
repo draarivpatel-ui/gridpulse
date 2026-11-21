@@ -418,15 +418,14 @@ export function computeCircuitHourlyProfile(circuit, scenario, circuitState) {
     let baseFactor = circuit.baselineHourlyFraction[hour];
     let shiftFactor = isShifted ? circuit.shiftedHourlyFraction[hour] : baseFactor;
 
-    // In winter polar vortex, morning heating (06:00-08:00) also carries elevated HVAC strip heat
+    // In winter polar vortex, morning heating (06:00-08:00) also carries elevated HVAC strip heat.
+    // The baseline is the no-intervention reference, so it never reads the shift flag: 0.92 duty
+    // in the vortex window regardless of relay state. The shifted profile pre-heats at 04:00-05:00
+    // (0.88) and coasts at 0.38 through the morning peak.
     if (resolvedScenario.id === 'ercot-winter-freeze' && circuit.id === 'hvac-central') {
       if (hour >= 6 && hour <= 8) {
-        baseFactor = isShifted ? 0.38 : 0.92;
-        if (!isShifted) {
-          shiftFactor = baseFactor;
-        } else {
-          shiftFactor = 0.38;
-        }
+        baseFactor = 0.92;
+        shiftFactor = isShifted ? 0.38 : baseFactor;
       } else if (hour >= 4 && hour <= 5 && isShifted) {
         shiftFactor = 0.88;
       }
@@ -486,15 +485,23 @@ export function calculateOutageBatteryEndurance({
   stateOfChargePct = 90,
   solarOffsetKw = 0
 }) {
-  const clampedSoc = Math.max(BATTERY_RESERVE_FLOOR_PCT, Math.min(100, Number(stateOfChargePct)));
+  const rawCapacity = Number(batteryCapacityKwh);
+  const safeCapacity = Number.isFinite(rawCapacity) && rawCapacity > 0
+    ? rawCapacity
+    : BATTERY_DEFAULT_CAPACITY_KWH;
+  const rawSoc = Number(stateOfChargePct);
+  const safeSoc = Number.isFinite(rawSoc) ? rawSoc : 90;
+  const clampedSoc = Math.max(BATTERY_RESERVE_FLOOR_PCT, Math.min(100, safeSoc));
   const usableFraction = (clampedSoc - BATTERY_RESERVE_FLOOR_PCT) / 100;
   const usableKwh = roundTo(
-    Number(batteryCapacityKwh) * usableFraction * BATTERY_INVERTER_EFFICIENCY,
+    safeCapacity * usableFraction * BATTERY_INVERTER_EFFICIENCY,
     2
   );
 
-  const grossLoadKw = roundTo(Math.max(0, Number(activeCircuitsKw)), 2);
-  const effectiveSolarKw = roundTo(Math.max(0, Number(solarOffsetKw)) * 0.35, 2);
+  const rawLoad = Number(activeCircuitsKw);
+  const grossLoadKw = roundTo(Number.isFinite(rawLoad) ? Math.max(0, rawLoad) : 0, 2);
+  const rawSolar = Number(solarOffsetKw);
+  const effectiveSolarKw = roundTo((Number.isFinite(rawSolar) ? Math.max(0, rawSolar) : 0) * 0.35, 2);
   const netDrainKw = roundTo(Math.max(0.12, grossLoadKw - effectiveSolarKw), 2);
 
   const rawHours = usableKwh / netDrainKw;
@@ -511,7 +518,7 @@ export function calculateOutageBatteryEndurance({
   }
 
   return {
-    batteryCapacityKwh: roundTo(Number(batteryCapacityKwh), 2),
+    batteryCapacityKwh: roundTo(safeCapacity, 2),
     stateOfChargePct: clampedSoc,
     usableKwh,
     grossLoadKw,
@@ -792,7 +799,7 @@ export function applyAppAction(state, action) {
 
   if (action.type === 'TOGGLE_BREAKER') {
     const circuit = getCircuitById(action.circuitId);
-    if (!circuit) {
+    if (!circuit || circuit.critical === true) {
       return next;
     }
     const prev = next.circuitStates[circuit.id] || { enabled: true, shifted: false };
@@ -849,7 +856,14 @@ export function renderOscilloscopeSvgMarkup(simulation) {
   const padBottom = 42;
   const plotW = width - padLeft - padRight;
   const plotH = height - padTop - padBottom;
-  const maxKwScale = 22.0;
+  const observedMaxKw = Math.max(
+    0,
+    ...simulation.baselineHourlyKw,
+    ...simulation.optimizedHourlyKw
+  );
+  // The scale always shows the full panel bus rating plus headroom to the real
+  // peak, so no curve ever pegs flat against the top of the plot.
+  const maxKwScale = Math.max(PANEL_MAX_BUS_KW, Math.ceil(observedMaxKw / 5) * 5);
 
   const xForHour = (h) => roundTo(padLeft + (h / 23) * plotW, 1);
   const yForKw = (kw) => roundTo(padTop + plotH - (Math.min(maxKwScale, Math.max(0, kw)) / maxKwScale) * plotH, 1);
@@ -874,9 +888,13 @@ export function renderOscilloscopeSvgMarkup(simulation) {
     }
   }
 
-  // Horizontal graticule lines
-  const yTicks = [0, 5, 10, 15, 20];
+  // Horizontal graticule lines plus the panel bus rating reference
+  const yTicks = [];
+  for (let t = 0; t <= maxKwScale; t += 5) yTicks.push(t);
   let gridLines = '';
+  const busY = yForKw(PANEL_MAX_BUS_KW);
+  gridLines += `<line x1="${padLeft}" y1="${busY}" x2="${width - padRight}" y2="${busY}" stroke="#C92A2A" stroke-dasharray="2 4" stroke-width="1.25" />`;
+  gridLines += `<text x="${width - padRight}" y="${busY - 4}" text-anchor="end" fill="#C92A2A" font-family="JetBrains Mono, monospace" font-size="10">${PANEL_MAX_BUS_KW}kW BUS</text>`;
   for (const tick of yTicks) {
     const y = yForKw(tick);
     gridLines += `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="#CBC6B6" stroke-dasharray="3 3" stroke-width="1" />`;
@@ -946,6 +964,16 @@ export function renderBreakerDirectoryMarkup(simulation) {
 
       const breakerBtnText = circuit.enabled ? 'CLOSED (ON)' : 'OPEN (SHED)';
 
+      const breakerButtonMarkup = circuit.critical
+        ? `<button type="button" class="${breakerBtnClass}" data-action="toggle-breaker" data-circuit-id="${circuit.id}" aria-pressed="true" disabled>
+            <span class="switch-lever" aria-hidden="true"></span>
+            <span class="tabular">PROTECTED (ON)</span>
+          </button>`
+        : `<button type="button" class="${breakerBtnClass}" data-action="toggle-breaker" data-circuit-id="${circuit.id}" aria-pressed="${circuit.enabled ? 'true' : 'false'}">
+            <span class="switch-lever" aria-hidden="true"></span>
+            <span class="tabular">${breakerBtnText}</span>
+          </button>`;
+
       const shiftControlMarkup = circuit.shiftable
         ? `<button type="button" class="shift-relay-btn ${circuit.shifted ? 'is-shifted' : ''}" data-action="toggle-shift" data-circuit-id="${circuit.id}" aria-pressed="${circuit.shifted ? 'true' : 'false'}">
             <span class="relay-dot" aria-hidden="true"></span>
@@ -984,10 +1012,7 @@ export function renderBreakerDirectoryMarkup(simulation) {
           </div>
         </div>
         <div class="circuit-controls-col">
-          <button type="button" class="${breakerBtnClass}" data-action="toggle-breaker" data-circuit-id="${circuit.id}" aria-pressed="${circuit.enabled ? 'true' : 'false'}">
-            <span class="switch-lever" aria-hidden="true"></span>
-            <span class="tabular">${breakerBtnText}</span>
-          </button>
+          ${breakerButtonMarkup}
           ${shiftControlMarkup}
         </div>
       </article>`;

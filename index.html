@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'" />
   <title>GridPulse | ERCOT Peak-Load Shift Optimizer &amp; Sub-Panel Telemetry</title>
   <meta name="description" content="Residential ERCOT peak-demand load-shift optimizer, 8-circuit breaker directory, 24-hour dual-curve oscilloscope, and 13.5 kWh LFP microgrid island endurance simulator." />
   <meta property="og:title" content="GridPulse | ERCOT Peak-Load Shift Optimizer &amp; Sub-Panel Telemetry" />
@@ -16,9 +16,6 @@
   <meta name="twitter:title" content="GridPulse | ERCOT Peak-Load Shift Optimizer &amp; Sub-Panel Telemetry" />
   <meta name="twitter:description" content="Residential ERCOT peak-demand load-shift optimizer, 8-circuit breaker directory, 24-hour dual-curve oscilloscope, and 13.5 kWh LFP microgrid island endurance simulator." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2311161B'/%3E%3Cpath d='M5 20H11L14 9L18 23L21 15H27' fill='none' stroke='%230D7A5F' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='27' cy='15' r='2' fill='%23F4F2EB'/%3E%3C/svg%3E" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -40,7 +37,8 @@
           <h1 class="brand-name">GridPulse</h1>
           <span class="bus-spec-tag tabular">ERCOT // 240V SPLIT-PHASE</span>
         </div>
-        <p class="brand-subcopy">Household Peak-Load Shift Optimizer, Sub-Panel Telemetry &amp; 13.5 kWh LFP Island Simulator</p>
+        <p class="brand-subcopy">Household Load-Shift and 13.5 kWh Battery Simulator</p>
+        <p class="brand-subcopy">Illustrative hourly model. Weather, reserves, tariffs and circuit profiles are synthetic planning inputs. No utility feed or electrical hardware is connected.</p>
       </div>
 
       <div class="header-controls">
@@ -76,7 +74,7 @@
     <section class="console-brief-grid" aria-labelledby="console-headline">
       <div class="brief-statement-col">
         <h2 id="console-headline" class="console-display-title">
-          Shave feeder peak demand before <em class="editorial-serif">simple-cycle gas peakers</em> &amp; rolling load-shed relays trip.
+          Explore household load shifts in a <em class="editorial-serif">simulated Texas grid</em>.
         </h2>
         <p id="scenario-summary" class="brief-lead">
           Stagnant high-pressure heat dome pushes afternoon ambient temperatures to 104°F while thermal generation derates and evening AC load spikes across ERCOT.
@@ -84,7 +82,7 @@
         <figure class="hardware-specimen-figure">
           <img
             src="./img/gridpulse-hero.jpg"
-            alt="Dieter Rams inspired GridPulse residential sub-panel load controller showing exposed copper bus bars, mechanical breaker toggles, and an LED strain arc gauge on limestone"
+            alt="Illustrative GridPulse controller concept with copper-colored bus bars, breaker toggles, and a strain gauge"
             width="960"
             height="540"
             loading="eager"
@@ -92,8 +90,8 @@
             class="hardware-specimen-img"
           />
           <figcaption class="hardware-specimen-caption tabular">
-            <span>FIG 01 // 240V SPLIT-PHASE COPPER BUS &amp; SOLID-STATE PEAK-SHIFT RELAY MODULE</span>
-            <span>CT CLAMP ACCURACY: +/-0.5%</span>
+            <span>FIG 01 // ILLUSTRATIVE CONTROLLER CONCEPT</span>
+            <span>No connected hardware or measured sensor accuracy</span>
           </figcaption>
         </figure>
         <div class="guidance-callout">
@@ -318,9 +316,72 @@
         </button>
 
         <div class="island-physics-note tabular">
-          <p><strong>Critical Bus Rule:</strong> Shedding 240V heating and EV circuits extends 13.5 kWh LFP runtime from ~2.5 hours to over 30 hours for medical CPAP, refrigeration, and gateway comms.</p>
+          <p><strong>Critical Bus Model:</strong> Compare the calculated battery runtime as noncritical circuits are shed. CPAP, refrigeration and gateway circuits remain protected in the simulator.</p>
         </div>
       </aside>
+    </section>
+
+    <!-- Advisor: marginal circuit contributions, greedy plan, scenario stress test -->
+    <section class="advisor-section" aria-labelledby="advisor-heading">
+      <div class="directory-header-bar">
+        <div>
+          <h2 id="advisor-heading" class="section-heading">Load-Shift Advisor</h2>
+          <p class="section-subcopy">Every candidate move is scored by running the full 24-hour simulator. Raise the comfort weight to prefer relay shifts over opening breakers, then apply the resulting plan.</p>
+        </div>
+        <div class="advisor-controls tabular">
+          <label for="comfort-weight">Comfort weight <strong id="comfort-weight-out">2.0</strong></label>
+          <input type="range" id="comfort-weight" min="0" max="4" step="0.1" value="2" aria-label="Comfort penalty weight for shedding a breaker">
+          <label for="plan-steps">Plan size <strong id="plan-steps-out">3 moves</strong></label>
+          <input type="range" id="plan-steps" min="1" max="6" step="1" value="3" aria-label="Maximum number of moves in the advisor plan">
+          <button type="button" class="sub-actuator-btn" id="apply-plan-btn" data-action="apply-advisor-plan">Apply Recommended Plan</button>
+        </div>
+      </div>
+
+      <div class="advisor-grid">
+        <div class="advisor-card">
+          <h3 class="advisor-card-title">Best single move right now</h3>
+          <p class="advisor-lead" id="advisor-best-move" aria-live="polite"></p>
+          <div class="tbl-scroll">
+            <table class="advisor-table">
+              <caption>Marginal value of every legal one-step breaker or relay change</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Circuit</th>
+                  <th scope="col">Move</th>
+                  <th scope="col">Peak kW</th>
+                  <th scope="col">Bill per day</th>
+                  <th scope="col">CO2 per day</th>
+                  <th scope="col">Score</th>
+                </tr>
+              </thead>
+              <tbody id="advisor-marginals-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="advisor-card">
+          <h3 class="advisor-card-title">Greedy plan for this budget</h3>
+          <p class="advisor-lead" id="advisor-plan-summary" aria-live="polite"></p>
+          <ol class="advisor-plan-list" id="advisor-plan-list"></ol>
+          <h3 class="advisor-card-title advisor-subhead">Scenario stress test</h3>
+          <p class="advisor-lead" id="advisor-stress-summary"></p>
+          <div class="tbl-scroll">
+            <table class="advisor-table">
+              <caption>The active schedule scored under all four ERCOT conditions</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Scenario</th>
+                  <th scope="col">Peak kW saved</th>
+                  <th scope="col">Bill per day</th>
+                  <th scope="col">CO2 per day</th>
+                  <th scope="col">Strain</th>
+                </tr>
+              </thead>
+              <tbody id="advisor-stress-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- 8-Circuit Household Sub-Panel Breaker Directory -->
@@ -328,7 +389,7 @@
       <div class="directory-header-bar">
         <div>
           <h2 id="breaker-directory-heading" class="section-heading">8-Circuit Sub-Panel Load Directory</h2>
-          <p class="section-subcopy">Throw individual 240V / 120V breakers or arm automated time-of-use peak-shift relays to clear the ERCOT alert window.</p>
+          <p class="section-subcopy">Toggle simulated circuit states or arm modeled time-of-use shifts to compare their effect on the household demand curve.</p>
         </div>
         <div class="directory-meta-right">
           <span id="breaker-summary-counts" class="directory-count-pill tabular">8 Closed / 0 Shed / 0 Shifted</span>
@@ -344,7 +405,7 @@
     <div class="print-sheet-header">
       <div>
         <h2 id="print-sheet-heading" class="print-sheet-title">GridPulse Sub-Panel Breaker &amp; Peak-Shift Placard</h2>
-        <p class="print-sheet-sub">Post inside residential load-center door for ERCOT Energy Emergency Alert (EEA) &amp; outage island switching.</p>
+        <p class="print-sheet-sub">Illustrative simulation worksheet. Circuit names, ratings, tariffs and runtime are model inputs or outputs. This page does not control or measure an electrical installation.</p>
       </div>
       <div class="print-sheet-metrics tabular">
         <div><span>Scenario:</span> <strong id="print-scenario-name">August 104°F Thermal Peak (16:00 - 20:00)</strong></div>
@@ -375,11 +436,11 @@
     <div class="container footer-grid">
       <div class="footer-left">
         <p><strong>GridPulse Residential Demand-Response &amp; Microgrid Console</strong> <span class="tabular">(v1.0.0)</span></p>
-        <p class="footer-tech-note tabular">Calibrated for ERCOT 15-minute settlement intervals, 240V split-phase residential load centers, and 13.5 kWh LFP backup storage.</p>
+        <p class="footer-tech-note tabular">Illustrative hourly Texas household model with a 13.5 kWh battery assumption. No measured settlement feed, household calibration or sensor data is used.</p>
       </div>
       <div class="footer-right tabular">
         <span>Zero External Runtime Dependencies</span>
-        <span>68 Automated Unit &amp; DOM Smoke Checks</span>
+        <span>127 Automated Unit &amp; DOM Checks</span>
       </div>
     </div>
   </footer>

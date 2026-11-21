@@ -565,3 +565,94 @@ describe('SVG Oscilloscope, Breaker Directory & Print Schedule Markup', () => {
     assert.ok(rows.includes('OPEN BREAKER (SHED)'));
   });
 });
+
+describe('Winter Baseline Integrity & Safety Guards (Adversarial Regressions)', () => {
+  it('49. winter-freeze HVAC baseline is identical whether the relay is armed or not', () => {
+    const hvac = getCircuitById('hvac-central');
+    const unshifted = computeCircuitHourlyProfile(hvac, 'ercot-winter-freeze', {
+      enabled: true,
+      shifted: false
+    });
+    const shifted = computeCircuitHourlyProfile(hvac, 'ercot-winter-freeze', {
+      enabled: true,
+      shifted: true
+    });
+    assert.deepEqual(shifted.baselineHourlyKw, unshifted.baselineHourlyKw);
+    // Exact reference: rated 3.8 kW * 1.35 vortex multiplier * 0.92 duty in hours 6..8
+    assert.equal(unshifted.baselineHourlyKw[6], 4.72);
+    assert.equal(unshifted.baselineHourlyKw[8], 4.72);
+    assert.equal(shifted.baselineHourlyKw[7], 4.72);
+  });
+
+  it('50. shifted winter schedule reports savings against the true unmodified baseline', () => {
+    const hvacShifted = createDefaultCircuitStateMap('unoptimized');
+    hvacShifted['hvac-central'] = { enabled: true, shifted: true };
+    const shiftedSim = simulateHouseholdGridPulse({
+      scenarioId: 'ercot-winter-freeze',
+      circuitStates: hvacShifted
+    });
+    const unshiftedSim = simulateHouseholdGridPulse({
+      scenarioId: 'ercot-winter-freeze',
+      circuitStates: createDefaultCircuitStateMap('unoptimized')
+    });
+    assert.deepEqual(shiftedSim.baselineHourlyKw, unshiftedSim.baselineHourlyKw);
+    assert.ok(shiftedSim.metrics.dailySavingsUsd > unshiftedSim.metrics.dailySavingsUsd);
+    assert.ok(shiftedSim.metrics.dailyCarbonAvoidedKg > unshiftedSim.metrics.dailyCarbonAvoidedKg);
+  });
+
+  it('51. TOGGLE_BREAKER cannot shed a critical protected circuit', () => {
+    const critical = HOUSEHOLD_CIRCUITS.find((c) => c.critical === true);
+    assert.ok(critical);
+    const before = createInitialAppState();
+    assert.equal(before.circuitStates[critical.id].enabled, true);
+    const after = applyAppAction(before, { type: 'TOGGLE_BREAKER', circuitId: critical.id });
+    assert.equal(after.circuitStates[critical.id].enabled, true);
+    // non-critical circuits still toggle
+    const nonCritical = HOUSEHOLD_CIRCUITS.find((c) => !c.critical);
+    const toggled = applyAppAction(before, { type: 'TOGGLE_BREAKER', circuitId: nonCritical.id });
+    assert.equal(toggled.circuitStates[nonCritical.id].enabled, false);
+  });
+
+  it('52. oscilloscope y-axis reaches the real peak and marks the 24 kW bus rating', () => {
+    const sim = simulateHouseholdGridPulse({
+      scenarioId: 'ercot-summer-peak',
+      circuitStates: createDefaultCircuitStateMap('unoptimized')
+    });
+    const svg = renderOscilloscopeSvgMarkup(sim);
+    const observedMax = Math.max(...sim.baselineHourlyKw, ...sim.optimizedHourlyKw);
+    const expectedCeiling = Math.max(PANEL_MAX_BUS_KW, Math.ceil(observedMax / 5) * 5);
+    assert.ok(svg.includes('>' + expectedCeiling + 'kW<'));
+    assert.ok(svg.includes(PANEL_MAX_BUS_KW + 'kW BUS'));
+  });
+
+  it('53. battery endurance sanitizes NaN and negative inputs without malformed durations', () => {
+    const nanRes = calculateOutageBatteryEndurance({
+      activeCircuitsKw: NaN,
+      batteryCapacityKwh: NaN,
+      stateOfChargePct: NaN,
+      solarOffsetKw: NaN
+    });
+    assert.match(nanRes.formattedDuration, /^\d+h \d{2}m$/);
+    assert.ok(Number.isFinite(nanRes.enduranceHoursDecimal));
+    assert.equal(nanRes.batteryCapacityKwh, BATTERY_DEFAULT_CAPACITY_KWH);
+
+    const negRes = calculateOutageBatteryEndurance({
+      activeCircuitsKw: -5,
+      batteryCapacityKwh: -13.5,
+      stateOfChargePct: -50,
+      solarOffsetKw: -2
+    });
+    assert.match(negRes.formattedDuration, /^\d+h \d{2}m$/);
+    assert.equal(negRes.stateOfChargePct, BATTERY_RESERVE_FLOOR_PCT);
+    assert.ok(negRes.hours >= 0 && negRes.minutes >= 0);
+  });
+
+  it('54. breaker directory renders protected critical circuits with a disabled switch', () => {
+    const sim = simulateHouseholdGridPulse(createInitialAppState());
+    const html = renderBreakerDirectoryMarkup(sim);
+    const criticalCount = HOUSEHOLD_CIRCUITS.filter((c) => c.critical === true).length;
+    assert.ok(criticalCount > 0);
+    assert.equal((html.match(/PROTECTED \(ON\)/g) || []).length, criticalCount);
+    assert.equal((html.match(/disabled/g) || []).length, criticalCount);
+  });
+});

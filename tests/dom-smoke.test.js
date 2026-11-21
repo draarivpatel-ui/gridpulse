@@ -146,3 +146,12 @@ test('DOM Smoke 20: buildUiViewState produces valid SVG oscilloscope and telemet
     assert.equal(/[\u2013\u2014]/.test(view.scenarioSummary), false);
   }
 });
+
+test('DOM Smoke 21: both advisor tables sit inside .tbl-scroll wrappers', () => {
+  const pattern = /<div class="tbl-scroll">\s*<table class="advisor-table">/g;
+  assert.equal((indexHtml.match(pattern) || []).length, 2);
+});
+
+test('DOM Smoke 22: .tbl-scroll enforces overflow-x auto so narrow viewports can reach every column', () => {
+  assert.match(stylesCss, /\.tbl-scroll\s*\{\s*overflow-x:\s*auto/);
+});

@@ -3,7 +3,7 @@
 ## 1. Concept Card
 
 - **Visual World:** Dieter Rams Braun Industrial Instrumentation & Swiss Grid Sub-Panel Placard
-- **Design Intent:** `Operate` + `Verify` (an engineered residential demand-response and microgrid load-shedding instrument for ERCOT households)
+- **Design Intent:** `Operate` + `Verify` (an illustrative residential demand-response and microgrid load-shedding instrument for ERCOT households)
 - **Physical References:**
   1. Braun T1000 / Dietrich Lubs anodized aluminum and warm limestone instrument consoles with tactile mechanical toggle switches
   2. Square D QO / Siemens residential load-center circuit breaker directory placards and amperage schedules
@@ -12,7 +12,7 @@
 
 ## 2. Color Palette & Surface Tokens
 
-Derived from powder-coated limestone electrical enclosures, recessed instrument wells, and high-legibility industrial signal pigments. Every text pairing meets or exceeds WCAG 2.1 AA contrast (`4.5:1` for body copy, `3:1` for large display numerals).
+Derived from powder-coated limestone electrical enclosures, recessed instrument wells, and high-legibility industrial signal pigments. The design targets WCAG 2.1 AA contrast (`4.5:1` for body copy, `3:1` for large display numerals). A complete measured contrast audit is not recorded here.
 
 | Token | Hex | Role |
 | :--- | :--- | :--- |
@@ -32,9 +32,9 @@ Derived from powder-coated limestone electrical enclosures, recessed instrument 
 
 ## 3. Typography & Hierarchy
 
-- **Primary Sans (`--font-sans`):** `'Space Grotesk'`, fallback `-apple-system, BlinkMacSystemFont, sans-serif`. Used for structural headings, breaker directory labels, and scenario controls with tight tracking (`-0.03em`) and decisive weight contrast (`500` vs `700`).
-- **Editorial Accent (`--font-serif`):** `'Instrument Serif'` italic, used selectively inside the primary display headline to anchor the civic and household mission.
-- **Technical Monospace (`--font-mono`):** `'JetBrains Mono'`, fallback `ui-monospace, SFMono-Regular, monospace`. Reserved strictly for hourly `kW` demand arrays, `kWh` battery reserves, `$` tariff rates, `kg CO2` marginal emissions, amperage ratings (`40A`, `30A`), and ERCOT interval timestamps (`16:00 - 20:00`).
+- **Primary Sans (`--font-sans`):** `system sans-serif`, fallback `-apple-system, BlinkMacSystemFont, sans-serif`. Used for structural headings, breaker directory labels, and scenario controls with tight tracking (`-0.03em`) and decisive weight contrast (`500` vs `700`).
+- **Editorial Accent (`--font-serif`):** `Georgia` italic, used selectively inside the primary display headline to anchor the civic and household mission.
+- **Technical Monospace (`--font-mono`):** `system monospace`, fallback `ui-monospace, SFMono-Regular, monospace`. Reserved strictly for hourly `kW` demand arrays, `kWh` battery reserves, `$` tariff rates, `kg CO2` marginal emissions, amperage ratings (`40A`, `30A`), and ERCOT interval timestamps (`16:00 - 20:00`).
 - **Numeric Discipline:** `font-variant-numeric: tabular-nums` enforced on every `kW`, `kWh`, dollar amount, `CO2` metric, percentage, and runtime hour/minute readout so live breaker actuation never causes horizontal layout jitter.
 
 ## 4. Layout Architecture & Craft Floor Guarantees
@@ -44,3 +44,9 @@ Derived from powder-coated limestone electrical enclosures, recessed instrument 
 3. **8-Circuit Residential Load-Center Directory:** Tactile breaker switches for each household load (`HVAC 3.8 kW`, `Level-2 EV 9.6 kW`, `Electric Dryer 4.5 kW`, `Water Heater 3.5 kW`, `Induction Oven 3.2 kW`, `Pool Pump 1.8 kW`, `Medical & Fridge 0.45 kW`, `Lighting & Routers 0.35 kW`) with individual `ON/SHED` breaker throws and `PEAK SHIFT` time-of-use relay toggles, plus a **One-Tap Auto-Optimize Peak Shift** master actuator.
 4. **LFP Outage Island Simulator:** Interactive `13.5 kWh` lithium iron phosphate (LFP) backup reserve calculator with adjustable State of Charge (`20%` to `100%`) and solar recharge offset, computing exact hours and minutes of island endurance and critical-load shedding recommendations.
 5. **Anti-Slop Compliance:** Zero em-dashes or en-dashes anywhere in the repository, zero small all-caps eyebrow kickers above headings, zero emoji icons (100% custom inline SVGs with consistent `1.75px` stroke weight), zero `border-left` > `1px` stripes, and complete browser surface theming (`::selection`, `::-webkit-scrollbar`, `:focus-visible`, `@media print`, and `@media (prefers-reduced-motion: reduce)`).
+
+## Local audit correction
+
+The page uses system font stacks and local assets. Its hero image is an
+illustrative concept, not a photograph of a validated controller. No sensor
+accuracy was measured. Printed schedules are simulation worksheets.
