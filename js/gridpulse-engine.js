@@ -831,6 +831,14 @@ export function applyAppAction(state, action) {
     return next;
   }
 
+  if (action.type === 'SET_BATTERY_CAPACITY') {
+    const numeric = Number(action.value);
+    if (Number.isFinite(numeric)) {
+      next.batteryCapacityKwh = Math.max(6.75, Math.min(40.5, roundTo(numeric, 2)));
+    }
+    return next;
+  }
+
   if (action.type === 'TOGGLE_SOLAR_OFFSET') {
     next.solarOffsetEnabled = !next.solarOffsetEnabled;
     return next;
@@ -1081,6 +1089,7 @@ export function buildUiViewState(state) {
     outageUsableText: `${out.usableKwh.toFixed(2)} kWh usable`,
     outageDrainText: `${out.netDrainKw.toFixed(2)} kW net drain`,
     outageSocText: `${out.stateOfChargePct}% SoC`,
+    outageCapacityText: `${out.batteryCapacityKwh.toFixed(2)} kWh`,
     outageStatusLabel:
       out.enduranceStatus === 'EXTENDED_ISLAND_SAFE'
         ? 'Extended Island Endurance (18h+)'

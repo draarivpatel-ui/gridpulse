@@ -35,6 +35,19 @@ grid conditions.
   feeder strain and the best bill saving.
 - Prints a one-page simulation worksheet (`Cmd+P` / `Ctrl+P`) with the model's
   breaker directory and calculated schedule.
+- Compares 5 deterministic outage and tariff policies (unshifted baseline, TOU
+  delay shift, comfort-safe advisor, battery peak shave and critical island
+  survival) under all 4 shipped ERCOT conditions, computing peak kW, daily
+  kWh, bill, carbon and island endurance for every cell and proving the
+  critical buses are never shed.
+- Sweeps the LFP pack from 6.75 to 40.5 kWh at a 10 or 20 percent reserve
+  floor and reports the smallest capacity that clears a 24h or 48h island
+  outage for each policy, with focusable SVG charts.
+- Exports a SHA-256 stamped resilience brief as JSON, formula-safe CSV and
+  Markdown. One cached stamped payload feeds the on-page fingerprint and all
+  three exports, so a tamper in any field breaks verification.
+- Restores the full lab state from a strict `#gp=` bookmark hash and runs 14
+  deterministic self-tests inside the page.
 
 ## How the advisor works
 
@@ -46,6 +59,21 @@ island endurance, minus a comfort penalty proportional to the nameplate rating
 of any shed circuit. Critical circuits are never offered for shedding. The
 search rescores every legal move at every step, so it is deterministic and
 independent of iteration order.
+
+## How the policy lab works
+
+Every lab policy is also a real circuit state map. The comparator calls the
+same `simulateHouseholdGridPulse` on each of the 5 policies under each of the
+4 conditions, so no cell can report a figure the engine does not produce. The
+endurance math is the engine's outage formula with the reserve floor exposed
+as a parameter; at the shipped 10 percent floor the lab result is identical
+to the engine call. The SHA-256 implementation is a self-contained FIPS 180-4
+digest verified against known-answer vectors and `node:crypto` in the test
+suite. The export digest covers one canonical JSON payload cached per state
+key, so the page line, the JSON, the CSV header and the Markdown footer all
+carry the same fingerprint. The `#gp=` codec accepts only a fixed lowercase
+field grammar and clamps every number back into the shipped ranges, so a
+malformed or hostile hash can never install unsafe state.
 
 At the default comfort weight of 2.0, the four move plan from the unoptimized
 baseline is to arm the EV charger, HVAC, dryer and water heater relays; no
@@ -92,8 +120,11 @@ index.html                    the whole app and the advisor panel
 styles.css                    the design system and advisor layout
 js/gridpulse-engine.js        scenarios, circuits, simulator, SVG, view state
 js/gridpulse-advisor.js       move enumeration, scoring, greedy plan, stress test
+js/gridpulse-lab.js           5-policy comparator, battery sweep, SHA-256 export,
+                              #gp= bookmark codec, self-tests, SVG charts
 js/app.js                     panel rendering and all interactive wiring
-tests/                        engine, DOM smoke, advisor unit and live UI suites
+tests/                        engine, DOM smoke, advisor and lab unit and live
+                              UI suites
 tests/helpers/dom.js          the DOM shim that executes app.js under node:test
 DESIGN.md                     the industrial instrument design system
 DEVPOST_UPGRADE.md            the upgrade log and exact verification commands
@@ -105,36 +136,49 @@ The suite covers the scenario catalog, the circuit profiles, the 24-hour
 simulator, the battery endurance math, the state reducer, the SVG oscilloscope,
 the breaker directory, the printable placard, the advisor's move enumeration,
 the marginal contributions, the greedy plan, the comparison and the stress
-test, plus live execution of every button, slider and scenario tab. Compliance
-tests scan every text file in the repository for two dash characters and vendor
-model names, and check that every label and DOM binding resolves.
+test, plus live execution of every button, slider, scenario tab, policy row,
+chart point, export, verify/tamper demo and self-test runner. The lab suites
+assert per-cell parity with direct simulator calls, the non-shedding
+invariant in all 20 cells, SHA-256 parity across the page and all three
+exports, and fail-closed decoding of malformed and hostile `#gp=` hashes.
+Compliance tests scan every text file in the repository for two dash
+characters and vendor model names, and check that every label and DOM binding
+resolves.
 
 ## Honest scope
 
 All scenarios, tariff rates, weather multipliers, circuit profiles and battery
 constants are illustrative planning values authored for this simulator, not
 metered data from a real home or a published ERCOT settlement feed. The advisor
-optimizes the numbers in this model, not a real utility bill. Nothing here is a
-claim about a real installation, a utility program or a hardware vendor.
+optimizes the numbers in this model, not a real utility bill. The policy lab
+compares the same deterministic reference model across policies; its sizing
+curve is a model output, not a sizing recommendation for a real installation.
+The SHA-256 digest is unkeyed tamper detection, not a signature or a promise
+of correctness. Nothing here is a claim about a real installation, a utility
+program or a hardware vendor, and nothing is electrical advice.
 
 ## License
 
 MIT
 
-## November 16 local verification
+## November 22 local verification
 
-139 Node tests passed, 0 failed, 0 skipped, 0 cancelled.
+385 Node tests passed, 0 failed, 0 skipped, 0 cancelled.
 
-`npm test` runs all four existing test files with
+`npm test` runs all six test files with
 `node --experimental-vm-modules --test`. Inputs and results are illustrative
-simulation values. External font requests and the unmeasured sensor-accuracy
-claim were removed.
+simulation values. The Policy & Outage-Survival Lab was added: a 5-policy x
+4-condition comparator, a 6.75 to 40.5 kWh battery sizing sweep, a SHA-256
+audited JSON/CSV/Markdown brief exporter, a strict `#gp=` bookmark codec and
+a 14-check in-page self-test runner.
 
 Verification environment. Node v24.16.0 and Python 3.9.6, with pytest 8.4.2
-for Python test files where present. No browser or physical hardware session
-was run.
+for Python test files where present. Headless Chromium checks at 1440x900 and
+390x844 verified zero console errors, zero page exceptions, zero external
+requests and zero horizontal overflow, with real pointer clicks on the lab
+controls and a `#gp=` reload restore of every encoded field.
 
 The footer no longer claims calibration to 15-minute settlement intervals.
 The implemented model uses hourly samples. The page identifies reserve,
 weather and tariff values as synthetic, removes a fixed battery-runtime
-promise, and updates the visible test count from 68 to 139.
+promise, and updates the visible test count from 139 to 385.

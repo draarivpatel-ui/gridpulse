@@ -384,6 +384,115 @@
       </div>
     </section>
 
+    <!-- Policy & Outage-Survival Lab: 5-policy x 4-condition comparator, LFP sizing sweep, audited exports -->
+    <section class="lab-section" id="lab-section" aria-labelledby="lab-heading" hidden>
+      <div class="directory-header-bar">
+        <div>
+          <h2 id="lab-heading" class="section-heading">Policy &amp; Outage-Survival Lab</h2>
+          <p class="section-subcopy">Scores five deterministic demand policies under all four ERCOT conditions through the same simulator, then sizes the LFP reserve against 24h and 48h island targets. Reference-model values, not live telemetry or electrical advice.</p>
+        </div>
+        <div class="lab-controls tabular">
+          <label for="lab-battery-kwh">Battery capacity <strong id="lab-battery-kwh-out">13.50 kWh</strong></label>
+          <input type="range" id="lab-battery-kwh" min="6.75" max="40.5" step="6.75" value="13.5" aria-label="LFP battery capacity in kilowatt hours" />
+          <label for="lab-reserve-floor">Reserve floor</label>
+          <select id="lab-reserve-floor" aria-label="LFP reserve floor percentage">
+            <option value="10" selected>10% reserve floor</option>
+            <option value="20">20% reserve floor</option>
+          </select>
+          <label for="lab-comfort-weight">Comfort weight <strong id="lab-comfort-weight-out">2.0</strong></label>
+          <input type="range" id="lab-comfort-weight" min="0" max="4" step="0.1" value="2" aria-label="Comfort penalty weight used by the advisor policy" />
+        </div>
+      </div>
+
+      <fieldset class="lab-policy-picker">
+        <legend>Active policy for charts, sizing and exports</legend>
+        <label><input type="radio" name="lab-policy" id="lab-policy-unshifted-baseline" value="unshifted-baseline" /> Unshifted Baseline</label>
+        <label><input type="radio" name="lab-policy" id="lab-policy-tou-delay-shift" value="tou-delay-shift" checked /> TOU Delay Shift</label>
+        <label><input type="radio" name="lab-policy" id="lab-policy-comfort-safe-advisor" value="comfort-safe-advisor" /> Comfort-Safe Advisor</label>
+        <label><input type="radio" name="lab-policy" id="lab-policy-battery-peak-shave" value="battery-peak-shave" /> Battery Peak Shave</label>
+        <label><input type="radio" name="lab-policy" id="lab-policy-critical-island-survival" value="critical-island-survival" /> Critical Island Survival</label>
+      </fieldset>
+
+      <div class="lab-grid">
+        <div class="lab-card">
+          <h3 class="advisor-card-title">Five-policy comparator under <span id="lab-comparator-scenario">August 104°F Thermal Peak</span></h3>
+          <div class="tbl-scroll">
+            <table class="advisor-table lab-table">
+              <caption>Each policy evaluated by the real simulator under the active ERCOT condition</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Policy</th>
+                  <th scope="col">Peak kW</th>
+                  <th scope="col">Shaved kW</th>
+                  <th scope="col">kWh/day</th>
+                  <th scope="col">Bill/day</th>
+                  <th scope="col">CO2 kg/day</th>
+                  <th scope="col">Island h</th>
+                  <th scope="col">Shed kW</th>
+                  <th scope="col">Score</th>
+                  <th scope="col">Criticals</th>
+                </tr>
+              </thead>
+              <tbody id="lab-comparator-body"></tbody>
+            </table>
+          </div>
+          <div class="lab-apply-row">
+            <button type="button" class="sub-actuator-btn" id="lab-apply-policy-btn" data-action="lab-apply-policy">Apply Selected Policy to Panel</button>
+          </div>
+          <h3 class="advisor-card-title advisor-subhead">Island endurance hours under every condition</h3>
+          <div class="tbl-scroll">
+            <table class="advisor-table lab-table">
+              <caption>Battery endurance for each policy under each ERCOT condition at the lab reserve floor</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Policy</th>
+                  <th scope="col">Aug Peak</th>
+                  <th scope="col">Feb Freeze</th>
+                  <th scope="col">Wind Drop</th>
+                  <th scope="col">Island</th>
+                </tr>
+              </thead>
+              <tbody id="lab-matrix-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <h3 class="advisor-card-title">Peak reduction vs island endurance</h3>
+          <div id="lab-tradeoff-chart" class="lab-chart-stage"></div>
+          <h3 class="advisor-card-title advisor-subhead">LFP battery sizing curve</h3>
+          <div id="lab-sizing-chart" class="lab-chart-stage"></div>
+          <p id="lab-sizing-note" class="section-subcopy tabular"></p>
+        </div>
+      </div>
+
+      <div class="lab-audit-bar">
+        <div class="lab-digest-row">
+          <span class="lab-digest-label">Resilience brief integrity</span>
+          <code id="lab-digest-line" class="tabular">sha256:pending</code>
+          <span id="lab-verify-status" class="tabular" data-tone=""></span>
+        </div>
+        <div class="lab-export-actions">
+          <button type="button" class="sub-actuator-btn" data-action="lab-export-json">Export JSON</button>
+          <button type="button" class="sub-actuator-btn" data-action="lab-export-csv">Export CSV</button>
+          <button type="button" class="sub-actuator-btn" data-action="lab-export-md">Export Markdown</button>
+          <button type="button" class="sub-actuator-btn" data-action="lab-copy-share">Copy #gp= Share Link</button>
+          <button type="button" class="sub-actuator-btn" data-action="lab-verify-digest">Verify Digest</button>
+          <button type="button" class="sub-actuator-btn" data-action="lab-tamper-demo">Tamper + Re-Verify</button>
+          <button type="button" class="sub-actuator-btn" id="lab-run-tests-btn" data-action="lab-run-self-tests">Run In-Page Checks</button>
+        </div>
+        <div class="lab-share-row">
+          <label for="lab-share-url">Bookmark link</label>
+          <input type="text" id="lab-share-url" readonly value="" aria-label="Bookmarkable share URL carrying the lab state" />
+        </div>
+        <pre id="lab-export-preview" class="lab-export-preview" hidden></pre>
+        <div class="lab-selftest">
+          <p id="lab-selftest-summary" class="tabular" data-tone="">Deterministic in-page checks are ready to run.</p>
+          <ol id="lab-selftest-list" class="lab-selftest-list"></ol>
+        </div>
+      </div>
+    </section>
+
     <!-- 8-Circuit Household Sub-Panel Breaker Directory -->
     <section class="breaker-directory-section" aria-labelledby="breaker-directory-heading">
       <div class="directory-header-bar">
@@ -411,7 +520,7 @@
         <div><span>Scenario:</span> <strong id="print-scenario-name">August 104°F Thermal Peak (16:00 - 20:00)</strong></div>
         <div><span>Peak Shaved:</span> <strong id="print-peak-reduction">-0.00 kW (0.0% shaved)</strong></div>
         <div><span>Est. 30-Day Savings:</span> <strong id="print-monthly-savings">$0.00 / 30d</strong></div>
-        <div><span>13.5 kWh Island Runtime:</span> <strong id="print-outage-endurance">2h 20m @ 90% SoC</strong></div>
+        <div><span id="print-battery-label">13.5 kWh Island Runtime:</span> <strong id="print-outage-endurance">2h 20m @ 90% SoC</strong></div>
       </div>
     </div>
 

@@ -225,7 +225,16 @@ export async function runAppModule(env) {
   const mod = new vm.SourceTextModule(source, {
     context,
     identifier: moduleUrl,
-    initializeImportMeta(meta) { meta.url = moduleUrl; }
+    initializeImportMeta(meta) { meta.url = moduleUrl; },
+    // app.js lazily imports the lab module so the page still works when the
+    // file is missing. The shim resolves that dynamic import to the real
+    // module through the same synthetic-module path used for static imports.
+    importModuleDynamically: async (specifier) => {
+      const dynamic = await syntheticFor(specifier, moduleUrl);
+      await dynamic.link(() => syntheticFor('', moduleUrl));
+      await dynamic.evaluate();
+      return dynamic;
+    }
   });
   await mod.link((spec, ref) => syntheticFor(spec, ref.identifier ?? moduleUrl));
   await mod.evaluate();
