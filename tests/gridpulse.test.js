@@ -27,6 +27,7 @@ import {
   renderPrintScheduleRowsMarkup,
   buildUiViewState
 } from '../js/gridpulse-engine.js';
+import { enumerateMoves } from '../js/gridpulse-advisor.js';
 
 describe('GridPulse ERCOT Scenarios & Circuit Catalog', () => {
   it('1. exposes exactly 4 realistic ERCOT grid weather and reserve scenarios', () => {
@@ -654,5 +655,59 @@ describe('Winter Baseline Integrity & Safety Guards (Adversarial Regressions)', 
     assert.ok(criticalCount > 0);
     assert.equal((html.match(/PROTECTED \(ON\)/g) || []).length, criticalCount);
     assert.equal((html.match(/disabled/g) || []).length, criticalCount);
+  });
+});
+
+describe('Adversarial Input Hardening & Zero-State Formatting Regressions', () => {
+  it('55. computeGridStrainIndex clamps hostile numeric inputs to finite scores', () => {
+    for (const bad of [NaN, Infinity, -Infinity, 'bad', null, undefined]) {
+      const score = computeGridStrainIndex(bad, bad, false);
+      assert.ok(Number.isFinite(score), `non-finite score for ${String(bad)}`);
+      assert.ok(score >= 0 && score <= 100, `out-of-range score for ${String(bad)}`);
+    }
+    assert.equal(computeGridStrainIndex(Infinity, 4.2, false), 99);
+    assert.equal(computeGridStrainIndex(4, Infinity, false), computeGridStrainIndex(4, 1000, false));
+    assert.equal(classifyGridStrainIndex(NaN).band, 'CRITICAL');
+  });
+
+  it('56. simulator and move enumeration tolerate null and malformed circuit state maps', () => {
+    const nullMap = simulateHouseholdGridPulse({ circuitStates: null });
+    assert.equal(nullMap.metrics.activeCount, HOUSEHOLD_CIRCUITS.length);
+    assert.ok(Number.isFinite(nullMap.metrics.optimizedPeakMaxKw));
+
+    const malformedMap = simulateHouseholdGridPulse({ circuitStates: { 'ev-charger-l2': null } });
+    assert.equal(malformedMap.metrics.activeCount, HOUSEHOLD_CIRCUITS.length);
+
+    const moves = enumerateMoves({ 'ev-charger-l2': null });
+    const evActions = moves.filter((move) => move.circuitId === 'ev-charger-l2').map((move) => move.action);
+    assert.ok(evActions.includes('SHED'));
+    assert.equal(evActions.includes('RECLOSE'), false);
+  });
+
+  it('57. applyAppAction normalizes missing and malformed state instead of throwing', () => {
+    const recovered = applyAppAction(null, { type: 'TOGGLE_SOLAR_OFFSET' });
+    assert.equal(recovered.scenarioId, 'ercot-summer-peak');
+    assert.equal(recovered.solarOffsetEnabled, false);
+    assert.equal(recovered.circuitStates['medical-fridge-core'].enabled, true);
+
+    const malformed = applyAppAction({
+      scenarioId: NaN,
+      circuitStates: null,
+      batterySocPct: Infinity,
+      batteryCapacityKwh: -4,
+      solarOffsetEnabled: 'no',
+      inspectedHour: 99
+    }, { type: 'SET_INSPECTED_HOUR', hour: 7 });
+    assert.equal(malformed.scenarioId, 'ercot-summer-peak');
+    assert.equal(malformed.batterySocPct, 90);
+    assert.equal(malformed.batteryCapacityKwh, BATTERY_DEFAULT_CAPACITY_KWH);
+    assert.equal(malformed.solarOffsetEnabled, true);
+    assert.equal(malformed.inspectedHour, 7);
+  });
+
+  it('58. zero reduction and zero interval delta render without a negative sign', () => {
+    const view = buildUiViewState(createInitialAppState());
+    assert.equal(view.peakKwReductionText, '0.00 kW');
+    assert.equal(view.inspectedDeltaText, '0.00 kW');
   });
 });

@@ -345,6 +345,57 @@ function roundTo(value, decimals) {
   return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
 }
 
+function safeNumber(value, fallback = 0) {
+  try {
+    const numeric = Number(value);
+    return Number.isNaN(numeric) ? fallback : numeric;
+  } catch (_error) {
+    return fallback;
+  }
+}
+
+function normalizeCircuitStateEntry(entry) {
+  if (!entry || typeof entry !== 'object') {
+    return { enabled: true, shifted: false };
+  }
+  return {
+    enabled: entry.enabled !== false,
+    shifted: entry.shifted === true
+  };
+}
+
+function normalizeCircuitStateMap(circuitStates) {
+  const source = circuitStates && typeof circuitStates === 'object' ? circuitStates : {};
+  const normalized = {};
+  for (const circuit of HOUSEHOLD_CIRCUITS) {
+    normalized[circuit.id] = normalizeCircuitStateEntry(source[circuit.id]);
+  }
+  return normalized;
+}
+
+function normalizeAppState(state) {
+  const defaults = createInitialAppState();
+  const source = state && typeof state === 'object' ? state : {};
+  const rawSoc = safeNumber(source.batterySocPct, defaults.batterySocPct);
+  const rawCapacity = safeNumber(source.batteryCapacityKwh, defaults.batteryCapacityKwh);
+  const rawHour = safeNumber(source.inspectedHour, defaults.inspectedHour);
+  return {
+    scenarioId: getScenarioById(source.scenarioId).id,
+    circuitStates: normalizeCircuitStateMap(source.circuitStates),
+    batterySocPct: Number.isFinite(rawSoc) ? Math.max(20, Math.min(100, Math.round(rawSoc))) : defaults.batterySocPct,
+    batteryCapacityKwh: Number.isFinite(rawCapacity) && rawCapacity > 0
+      ? Math.max(6.75, Math.min(40.5, roundTo(rawCapacity, 2)))
+      : defaults.batteryCapacityKwh,
+    solarOffsetEnabled: source.solarOffsetEnabled === false ? false : true,
+    inspectedHour: Number.isInteger(rawHour) && rawHour >= 0 && rawHour <= 23 ? rawHour : defaults.inspectedHour
+  };
+}
+
+function formatLoadReductionKw(value) {
+  const numeric = safeNumber(value, 0);
+  return numeric > 0 ? `-${numeric.toFixed(2)} kW` : '0.00 kW';
+}
+
 export function getScenarioById(scenarioId) {
   if (typeof scenarioId !== 'string' || scenarioId.trim() === '') {
     return ERCOT_SCENARIOS[0];
@@ -448,16 +499,19 @@ export function computeCircuitHourlyProfile(circuit, scenario, circuitState) {
 }
 
 export function computeGridStrainIndex(peakWindowMaxKw, reserveMarginPct, isOutageIsland = false) {
-  const loadRatio = Math.min(1.2, Math.max(0, Number(peakWindowMaxKw) / 18.0));
+  const peakKw = safeNumber(peakWindowMaxKw, 0);
+  const reservePct = safeNumber(reserveMarginPct, 8.0);
+  const loadRatio = Math.min(1.2, Math.max(0, peakKw / 18.0));
   const reservePenalty = isOutageIsland
     ? 22
-    : Math.max(0, (8.0 - Number(reserveMarginPct)) * 4.5);
+    : Math.max(0, (8.0 - reservePct) * 4.5);
   const rawScore = Math.round(loadRatio * 68 + reservePenalty);
   return Math.max(0, Math.min(100, rawScore));
 }
 
 export function classifyGridStrainBand(strainIndex) {
-  const score = Number(strainIndex);
+  const numeric = safeNumber(strainIndex, NaN);
+  const score = Number.isNaN(numeric) ? 100 : numeric;
   if (score >= 75) {
     return {
       band: 'CRITICAL',
@@ -545,9 +599,10 @@ export function simulateHouseholdGridPulse({
   const optimizedHourlyKw = new Array(24).fill(0);
 
   const circuitBreakdown = [];
+  const safeCircuitStates = normalizeCircuitStateMap(circuitStates);
 
   for (const circuit of HOUSEHOLD_CIRCUITS) {
-    const state = circuitStates[circuit.id] || { enabled: true, shifted: false };
+    const state = safeCircuitStates[circuit.id];
     const profile = computeCircuitHourlyProfile(circuit, scenario, state);
 
     let circuitBaselinePeakSum = 0;
@@ -760,14 +815,7 @@ export function createInitialAppState() {
 }
 
 export function applyAppAction(state, action) {
-  const next = {
-    scenarioId: state.scenarioId,
-    circuitStates: { ...state.circuitStates },
-    batterySocPct: state.batterySocPct,
-    batteryCapacityKwh: state.batteryCapacityKwh,
-    solarOffsetEnabled: state.solarOffsetEnabled,
-    inspectedHour: state.inspectedHour
-  };
+  const next = normalizeAppState(state);
 
   if (!action || typeof action.type !== 'string') {
     return next;
@@ -1073,7 +1121,7 @@ export function buildUiViewState(state) {
     feederGuidance: sc.feederGuidance,
     baselinePeakMaxText: `${m.baselinePeakMaxKw.toFixed(2)} kW`,
     optimizedPeakMaxText: `${m.optimizedPeakMaxKw.toFixed(2)} kW`,
-    peakKwReductionText: `-${m.peakKwReduction.toFixed(2)} kW`,
+    peakKwReductionText: formatLoadReductionKw(m.peakKwReduction),
     peakReductionPctText: `${m.peakReductionPct.toFixed(1)}% shaved`,
     dailySavingsText: `$${m.dailySavingsUsd.toFixed(2)}`,
     monthlySavingsText: `$${m.monthlySavingsUsd.toFixed(2)} / 30d`,
@@ -1105,7 +1153,7 @@ export function buildUiViewState(state) {
     inspectedBaselineText: `${insp.baselineKw.toFixed(2)} kW`,
     inspectedOptimizedText: `${insp.optimizedKw.toFixed(2)} kW`,
     inspectedDeltaText:
-      insp.deltaKw >= 0 ? `-${insp.deltaKw.toFixed(2)} kW` : `+${Math.abs(insp.deltaKw).toFixed(2)} kW`,
+      insp.deltaKw > 0 ? `-${insp.deltaKw.toFixed(2)} kW` : insp.deltaKw < 0 ? `+${Math.abs(insp.deltaKw).toFixed(2)} kW` : '0.00 kW',
     inspectedTariffText: `$${insp.tariffPerKwh.toFixed(2)}/kWh`,
     activeCircuitCountText: `${m.activeCount} Closed / ${m.shedCount} Shed / ${m.shiftedCount} Shifted`,
     oscilloscopeSvg: renderOscilloscopeSvgMarkup(sim),

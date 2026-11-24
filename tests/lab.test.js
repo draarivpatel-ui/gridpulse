@@ -1231,3 +1231,28 @@ describe('Lab: engine capacity action integration', () => {
     assert.equal(large.outageEndurance.batteryCapacityKwh, 40.5);
   });
 });
+
+describe('Lab: accessibility semantics and cache integrity regressions', () => {
+  it('143. interactive chart SVGs expose group semantics rather than role img around buttons', () => {
+    const tradeoff = renderTradeoffChartSvg(initial(), {});
+    const sizing = renderSizingCurveSvg(initial(), {});
+    for (const svg of [tradeoff, sizing]) {
+      assert.equal(svg.includes('role="img"'), false);
+      assert.ok(svg.includes('role="group"'));
+      assert.ok(svg.includes('role="button"'));
+    }
+  });
+
+  it('144. cached stamped reports are deep-frozen against accidental mutation', () => {
+    const stamped = getStampedReport(initial(), {});
+    assert.equal(Object.isFrozen(stamped.payload), true);
+    assert.equal(Object.isFrozen(stamped.payload.inputs), true);
+    assert.equal(Object.isFrozen(stamped.payload.comparator), true);
+    assert.throws(() => {
+      stamped.payload.inputs.batteryCapacityKwh = 99;
+    }, TypeError);
+    const again = getStampedReport(initial(), {});
+    assert.equal(again.payload.inputs.batteryCapacityKwh, 13.5);
+    assert.equal(verifyStampedReport(again).ok, true);
+  });
+});

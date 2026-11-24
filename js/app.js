@@ -26,6 +26,42 @@ function setHtml(id, html) {
   }
 }
 
+function captureFocusDescriptor() {
+  const active = typeof document !== 'undefined' ? document.activeElement : null;
+  if (!active || typeof active.getAttribute !== 'function') return null;
+  const action = active.getAttribute('data-action');
+  const circuitId = active.getAttribute('data-circuit-id');
+  if (action && circuitId) return { kind: 'circuit-action', action, circuitId };
+  const policyPoint = active.getAttribute('data-lab-policy-point');
+  if (policyPoint) return { kind: 'lab-policy-point', policyPoint };
+  const labKwh = active.getAttribute('data-lab-kwh');
+  if (labKwh) return { kind: 'lab-kwh', labKwh };
+  return null;
+}
+
+function restoreFocusDescriptor(descriptor) {
+  if (!descriptor || typeof document === 'undefined' || typeof document.querySelectorAll !== 'function') return;
+  let selector = '';
+  if (descriptor.kind === 'circuit-action') selector = '[data-action]';
+  if (descriptor.kind === 'lab-policy-point') selector = '[data-lab-policy-point]';
+  if (descriptor.kind === 'lab-kwh') selector = '[data-lab-kwh]';
+  if (!selector) return;
+  const candidates = Array.from(document.querySelectorAll(selector) || []);
+  const target = candidates.find((el) => {
+    if (descriptor.kind === 'circuit-action') {
+      return el.getAttribute('data-action') === descriptor.action &&
+        el.getAttribute('data-circuit-id') === descriptor.circuitId;
+    }
+    if (descriptor.kind === 'lab-policy-point') {
+      return el.getAttribute('data-lab-policy-point') === descriptor.policyPoint;
+    }
+    return el.getAttribute('data-lab-kwh') === descriptor.labKwh;
+  });
+  if (target && typeof target.focus === 'function') {
+    target.focus({ preventScroll: true });
+  }
+}
+
 function signed(value, digits, unit) {
   const n = Number(value);
   const prefix = n > 0 ? '+' : '';
@@ -119,6 +155,7 @@ function labOptions() {
 
 function renderLab() {
   if (!labModule) return;
+  const focusDescriptor = captureFocusDescriptor();
   const mod = labModule;
   const opts = labOptions();
 
@@ -154,6 +191,7 @@ function renderLab() {
 
   const stamped = mod.getStampedReport(currentState, opts);
   setText('lab-digest-line', `sha256:${stamped.digestHex}`);
+  restoreFocusDescriptor(focusDescriptor);
 }
 
 function applyLabBookmark() {
@@ -179,12 +217,16 @@ function labDownload(filename, text, mime) {
   if (typeof Blob !== 'function' || typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
     return false;
   }
+  const objectUrl = URL.createObjectURL(new Blob([text], { type: mime }));
   const anchor = document.createElement('a');
-  anchor.href = URL.createObjectURL(new Blob([text], { type: mime }));
+  anchor.href = objectUrl;
   anchor.download = filename;
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
+  if (typeof URL.revokeObjectURL === 'function') {
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  }
   return true;
 }
 
@@ -350,6 +392,7 @@ function bootLab() {
 }
 
 function renderApp() {
+  const focusDescriptor = captureFocusDescriptor();
   const view = buildUiViewState(currentState);
 
   // Update scenario tabs
@@ -439,6 +482,7 @@ function renderApp() {
 
   renderAdvisor();
   renderLab();
+  restoreFocusDescriptor(focusDescriptor);
 }
 
 function dispatch(action) {
@@ -539,11 +583,13 @@ function bindEvents() {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     const labKwh = event.target.closest('[data-lab-kwh]');
     if (labKwh) {
+      event.preventDefault();
       dispatch({ type: 'SET_BATTERY_CAPACITY', value: Number(labKwh.getAttribute('data-lab-kwh')) });
       return;
     }
     const labPolicyPoint = event.target.closest('[data-lab-policy-point]');
     if (labPolicyPoint) {
+      event.preventDefault();
       labState.policyId = labPolicyPoint.getAttribute('data-lab-policy-point');
       renderLab();
     }

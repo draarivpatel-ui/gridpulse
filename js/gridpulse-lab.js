@@ -356,9 +356,16 @@ export function evaluatePolicy(scenarioId, policyId, appState = {}, labOptions =
 const matrixCache = new Map();
 const MEMO_MAX = 24;
 
+function deepFreeze(value, seen = new Set()) {
+  if (!value || typeof value !== 'object' || seen.has(value)) return value;
+  seen.add(value);
+  for (const key of Object.keys(value)) deepFreeze(value[key], seen);
+  return Object.freeze(value);
+}
+
 function memoGet(map, key, build) {
   if (map.has(key)) return map.get(key);
-  const value = build();
+  const value = deepFreeze(build());
   if (map.size >= MEMO_MAX) map.delete(map.keys().next().value);
   map.set(key, value);
   return value;
@@ -740,7 +747,7 @@ export function getStampedReport(appState = {}, labOptions = {}) {
   const payload = buildLabReportPayload(appState, labOptions);
   const canonical = canonicalJson(payload);
   const digestHex = sha256Hex(canonical);
-  const stamped = { payload, digestHex, canonical, cacheKey: key };
+  const stamped = { payload: deepFreeze(payload), digestHex, canonical, cacheKey: key };
   if (reportCache.size >= REPORT_CACHE_MAX) {
     reportCache.delete(reportCache.keys().next().value);
   }
@@ -1111,7 +1118,7 @@ export function renderTradeoffChartSvg(appState = {}, labOptions = {}) {
     </g>`;
   }).join('\n');
 
-  return `<svg class="lab-chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Tradeoff chart of peak kilowatt reduction against island battery endurance for five policies under ${escapeXml(scenario.name)}">
+  return `<svg class="lab-chart-svg" viewBox="0 0 ${width} ${height}" role="group" aria-label="Tradeoff chart of peak kilowatt reduction against island battery endurance for five policies under ${escapeXml(scenario.name)}">
   ${grid}
   <text x="${padLeft + plotW / 2}" y="${height - 8}" text-anchor="middle" fill="#3E4852" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10">Island endurance hours (${matrix.inputs.reserveFloorPct}% floor)</text>
   <text x="12" y="${padTop + plotH / 2}" text-anchor="middle" transform="rotate(-90 12 ${padTop + plotH / 2})" fill="#3E4852" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10">Peak kW shaved</text>
@@ -1180,7 +1187,7 @@ export function renderSizingCurveSvg(appState = {}, labOptions = {}) {
     </circle>`;
   }).join('\n');
 
-  return `<svg class="lab-chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="LFP battery sizing curve of island endurance hours against capacity for the ${escapeXml(entry.policyName)} policy at ${sizing.reserveFloorPct} percent reserve floor">
+  return `<svg class="lab-chart-svg" viewBox="0 0 ${width} ${height}" role="group" aria-label="LFP battery sizing curve of island endurance hours against capacity for the ${escapeXml(entry.policyName)} policy at ${sizing.reserveFloorPct} percent reserve floor">
   ${grid}
   ${targets}
   <polyline fill="none" stroke="#0D7A5F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${polyline}" />

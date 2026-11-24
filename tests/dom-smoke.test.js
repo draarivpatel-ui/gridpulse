@@ -155,3 +155,77 @@ test('DOM Smoke 21: both advisor tables sit inside .tbl-scroll wrappers', () => 
 test('DOM Smoke 22: .tbl-scroll enforces overflow-x auto so narrow viewports can reach every column', () => {
   assert.match(stylesCss, /\.tbl-scroll\s*\{\s*overflow-x:\s*auto/);
 });
+
+test('DOM Smoke 23: visible text controls are not overridden by conflicting aria-labels', () => {
+  const tagFor = (tag, id) => {
+    const re = new RegExp(`<${tag}\\b[^>]*\\bid="${id}"[^>]*>`);
+    return indexHtml.match(re)?.[0] || '';
+  };
+  for (const id of [
+    'hour-scrubber-input',
+    'battery-soc-slider',
+    'comfort-weight',
+    'plan-steps',
+    'lab-battery-kwh',
+    'lab-reserve-floor',
+    'lab-comfort-weight',
+    'lab-share-url'
+  ]) {
+    const tag = tagFor(id === 'lab-reserve-floor' ? 'select' : 'input', id);
+    assert.ok(tag, `missing control #${id}`);
+    assert.equal(tag.includes('aria-label'), false, `#${id} overrides its visible label with aria-label`);
+  }
+});
+
+test('DOM Smoke 24: skip target clears the sticky header', () => {
+  assert.match(stylesCss, /\.main-console\s*\{[^}]*scroll-margin-top\s*:/);
+});
+
+test('DOM Smoke 25: reduced motion is intentional rather than a blanket 0.01ms kill', () => {
+  assert.equal(stylesCss.includes('animation-duration: 0.01ms !important'), false);
+  assert.equal(stylesCss.includes('transition-duration: 0.01ms !important'), false);
+  const reduced = stylesCss.match(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\n\}/);
+  assert.ok(reduced, 'missing reduced-motion block');
+  assert.match(reduced[0], /transition:\s*none/);
+});
+
+test('DOM Smoke 26: footer does not hard-code a stale test count', () => {
+  assert.equal(/\b\d+ Automated Unit &amp; DOM Checks\b/.test(indexHtml), false);
+  assert.match(indexHtml, /Automated Unit &amp; DOM Checks/);
+});
+
+test('DOM Smoke 27: initial zero reduction copy does not use negative zero', () => {
+  assert.equal(indexHtml.includes('-0.00 kW'), false);
+});
+
+test('DOM Smoke 28: full re-renders capture and restore keyboard focus without scrolling', () => {
+  assert.match(appJs, /function captureFocusDescriptor/);
+  assert.match(appJs, /function restoreFocusDescriptor/);
+  assert.match(appJs, /preventScroll/);
+});
+
+test('DOM Smoke 29: object URLs created for exports are revoked after download', () => {
+  assert.match(appJs, /revokeObjectURL/);
+});
+
+test('DOM Smoke 30: signal colors meet WCAG AA contrast on their tinted surfaces', () => {
+  const luminance = (hex) => {
+    const parts = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+      .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * parts[0] + 0.7152 * parts[1] + 0.0722 * parts[2];
+  };
+  const contrast = (a, b) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+  const token = (name) => stylesCss.match(new RegExp(`--${name}:\\s*(#[0-9A-Fa-f]{6})`))?.[1];
+  assert.ok(contrast(token('amber'), token('amber-wash')) >= 4.5, 'amber on amber wash below AA');
+  assert.ok(contrast(token('emerald'), token('emerald-wash')) >= 4.5, 'emerald on emerald wash below AA');
+  assert.ok(contrast(token('emerald'), token('panel')) >= 4.5, 'emerald on panel below AA');
+});
+
+test('DOM Smoke 31: CSS body-control font sizes do not drop below 12px', () => {
+  const sizes = [...stylesCss.matchAll(/font-size:\s*0\.(\d+)rem/g)].map((m) => Number(`0.${m[1]}`));
+  assert.ok(sizes.length > 0);
+  assert.equal(Math.min(...sizes) >= 0.76, true, `minimum rem size ${Math.min(...sizes)}`);
+});

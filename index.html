@@ -163,7 +163,7 @@
           <h3 class="readout-title">Peak Window Demand Reduction</h3>
           <span id="metric-peak-pct" class="readout-badge badge-emerald tabular">0.0% shaved</span>
         </div>
-        <p id="metric-peak-shaved" class="readout-value tabular">-0.00 kW</p>
+        <p id="metric-peak-shaved" class="readout-value tabular">0.00 kW</p>
         <p id="metric-peak-comparison" class="readout-sub tabular">19.65 kW baseline to 19.65 kW active</p>
       </div>
 
@@ -225,7 +225,6 @@
               max="23"
               step="1"
               value="18"
-              aria-label="Inspect hour of day from 00:00 to 23:00"
             />
           </div>
 
@@ -240,7 +239,7 @@
             </div>
             <div class="scrubber-cell">
               <span class="cell-label">Interval Delta</span>
-              <strong id="inspected-delta-kw">-0.00 kW</strong>
+              <strong id="inspected-delta-kw">0.00 kW</strong>
             </div>
             <div class="scrubber-cell">
               <span class="cell-label">Interval Tariff</span>
@@ -283,7 +282,7 @@
             max="100"
             step="5"
             value="90"
-            aria-label="LFP Battery State of Charge Percentage"
+
           />
           <div class="soc-scale-ticks" aria-hidden="true">
             <span>20%</span>
@@ -330,9 +329,9 @@
         </div>
         <div class="advisor-controls tabular">
           <label for="comfort-weight">Comfort weight <strong id="comfort-weight-out">2.0</strong></label>
-          <input type="range" id="comfort-weight" min="0" max="4" step="0.1" value="2" aria-label="Comfort penalty weight for shedding a breaker">
+          <input type="range" id="comfort-weight" min="0" max="4" step="0.1" value="2">
           <label for="plan-steps">Plan size <strong id="plan-steps-out">3 moves</strong></label>
-          <input type="range" id="plan-steps" min="1" max="6" step="1" value="3" aria-label="Maximum number of moves in the advisor plan">
+          <input type="range" id="plan-steps" min="1" max="6" step="1" value="3">
           <button type="button" class="sub-actuator-btn" id="apply-plan-btn" data-action="apply-advisor-plan">Apply Recommended Plan</button>
         </div>
       </div>
@@ -393,14 +392,14 @@
         </div>
         <div class="lab-controls tabular">
           <label for="lab-battery-kwh">Battery capacity <strong id="lab-battery-kwh-out">13.50 kWh</strong></label>
-          <input type="range" id="lab-battery-kwh" min="6.75" max="40.5" step="6.75" value="13.5" aria-label="LFP battery capacity in kilowatt hours" />
+          <input type="range" id="lab-battery-kwh" min="6.75" max="40.5" step="6.75" value="13.5" />
           <label for="lab-reserve-floor">Reserve floor</label>
-          <select id="lab-reserve-floor" aria-label="LFP reserve floor percentage">
+          <select id="lab-reserve-floor">
             <option value="10" selected>10% reserve floor</option>
             <option value="20">20% reserve floor</option>
           </select>
           <label for="lab-comfort-weight">Comfort weight <strong id="lab-comfort-weight-out">2.0</strong></label>
-          <input type="range" id="lab-comfort-weight" min="0" max="4" step="0.1" value="2" aria-label="Comfort penalty weight used by the advisor policy" />
+          <input type="range" id="lab-comfort-weight" min="0" max="4" step="0.1" value="2" />
         </div>
       </div>
 
@@ -483,7 +482,7 @@
         </div>
         <div class="lab-share-row">
           <label for="lab-share-url">Bookmark link</label>
-          <input type="text" id="lab-share-url" readonly value="" aria-label="Bookmarkable share URL carrying the lab state" />
+          <input type="text" id="lab-share-url" readonly value="" />
         </div>
         <pre id="lab-export-preview" class="lab-export-preview" hidden></pre>
         <div class="lab-selftest">
@@ -518,7 +517,7 @@
       </div>
       <div class="print-sheet-metrics tabular">
         <div><span>Scenario:</span> <strong id="print-scenario-name">August 104°F Thermal Peak (16:00 - 20:00)</strong></div>
-        <div><span>Peak Shaved:</span> <strong id="print-peak-reduction">-0.00 kW (0.0% shaved)</strong></div>
+        <div><span>Peak Shaved:</span> <strong id="print-peak-reduction">0.00 kW (0.0% shaved)</strong></div>
         <div><span>Est. 30-Day Savings:</span> <strong id="print-monthly-savings">$0.00 / 30d</strong></div>
         <div><span id="print-battery-label">13.5 kWh Island Runtime:</span> <strong id="print-outage-endurance">2h 20m @ 90% SoC</strong></div>
       </div>
@@ -549,7 +548,7 @@
       </div>
       <div class="footer-right tabular">
         <span>Zero External Runtime Dependencies</span>
-        <span>127 Automated Unit &amp; DOM Checks</span>
+        <span>Automated Unit &amp; DOM Checks</span>
       </div>
     </div>
   </footer>

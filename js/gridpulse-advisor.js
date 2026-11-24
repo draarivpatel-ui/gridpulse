@@ -22,10 +22,20 @@ function roundTo(value, decimals) {
   return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
 }
 
+function normalizeMoveState(entry) {
+  if (!entry || typeof entry !== 'object') {
+    return { enabled: true, shifted: false };
+  }
+  return {
+    enabled: entry.enabled !== false,
+    shifted: entry.shifted === true
+  };
+}
+
 function cloneStates(state) {
   const copy = {};
   for (const key of Object.keys(state || {})) {
-    copy[key] = { enabled: state[key].enabled, shifted: state[key].shifted };
+    copy[key] = normalizeMoveState(state[key]);
   }
   return copy;
 }
@@ -41,7 +51,7 @@ export function enumerateMoves(circuitStates, options = {}) {
   const states = circuitStates || {};
   const moves = [];
   for (const circuit of HOUSEHOLD_CIRCUITS) {
-    const current = states[circuit.id] || { enabled: true, shifted: false };
+    const current = normalizeMoveState(states[circuit.id]);
     if (current.enabled) {
       if (!(protectCritical && circuit.critical === true)) {
         moves.push({

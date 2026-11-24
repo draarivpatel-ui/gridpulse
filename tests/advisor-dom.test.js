@@ -133,7 +133,7 @@ describe('Live UI: initial render', () => {
   it('11. the app renders the core telemetry into the real ids', async () => {
     const env = await boot();
     assert.equal(env.getEl('scenario-title').textContent, 'August 104°F Thermal Peak');
-    assert.match(env.getEl('metric-peak-shaved').textContent, /-0\.00 kW/);
+    assert.equal(env.getEl('metric-peak-shaved').textContent, '0.00 kW');
     assert.match(env.getEl('oscilloscope-stage').innerHTML, /<svg class="oscilloscope-svg"/);
     assert.equal(env.getEl('breaker-directory-list').innerHTML.includes('data-circuit-card='), true);
     assert.equal(env.getEl('print-schedule-tbody').innerHTML.includes('<tr>'), true);
@@ -202,7 +202,7 @@ describe('Live UI: interactive controls', () => {
 
   it('18. applying the plan changes the live telemetry and the breaker directory', async () => {
     const env = await boot();
-    assert.match(env.getEl('metric-peak-shaved').textContent, /-0\.00 kW/);
+    assert.equal(env.getEl('metric-peak-shaved').textContent, '0.00 kW');
     click(env, actionBtn(env, 'apply-advisor-plan'));
     assert.doesNotMatch(env.getEl('metric-peak-shaved').textContent, /-0\.00 kW/);
     assert.match(env.getEl('breaker-directory-list').innerHTML, /PEAK-SHIFT RELAY ARMED/);
@@ -215,7 +215,7 @@ describe('Live UI: interactive controls', () => {
     const optimized = env.getEl('metric-peak-shaved').textContent;
     assert.doesNotMatch(optimized, /-0\.00 kW/);
     click(env, actionBtn(env, 'reset-baseline'));
-    assert.equal(env.getEl('metric-peak-shaved').textContent, '-0.00 kW');
+    assert.equal(env.getEl('metric-peak-shaved').textContent, '0.00 kW');
   });
 
   it('20. selecting each scenario updates the title and stress table', async () => {

@@ -443,3 +443,29 @@ describe('Lab DOM: graceful degradation and page integrity', () => {
     assert.equal(decoded.scenarioId, 'ercot-summer-peak');
   });
 });
+
+describe('Lab DOM: keyboard activation regressions', () => {
+  it('45. Space activation on a chart control prevents page scroll', async () => {
+    const env = await boot();
+    env.document.body.setAttribute('data-lab-kwh', '27');
+    let prevented = 0;
+    env.document.fire('keydown', {
+      target: env.document.body,
+      key: ' ',
+      preventDefault() { prevented += 1; }
+    });
+    assert.equal(prevented, 1);
+  });
+
+  it('46. Enter activation on a chart policy point prevents duplicate default behavior', async () => {
+    const env = await boot();
+    env.document.body.setAttribute('data-lab-policy-point', 'critical-island-survival');
+    let prevented = 0;
+    env.document.fire('keydown', {
+      target: env.document.body,
+      key: 'Enter',
+      preventDefault() { prevented += 1; }
+    });
+    assert.equal(prevented, 1);
+  });
+});
