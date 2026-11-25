@@ -852,6 +852,8 @@ describe('Lab: SVG and table renderers', () => {
     assert.equal((svg.match(/tabindex="0"/g) || []).length, 6);
     assert.ok(svg.includes('24h outage target'));
     assert.ok(svg.includes('48h outage target'));
+    assert.ok(svg.includes('fill="#0A6B53"'));
+    assert.ok(svg.includes('fill="#9A4A05"'));
     assert.equal(/NaN|undefined|Infinity/.test(svg), false);
     assert.equal(/[\u2013\u2014]/.test(svg), false);
   });

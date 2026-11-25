@@ -76,7 +76,7 @@ scenario tab updates the title and the stress table.
 ```sh
 cd gridpulse
 npm test
-node --experimental-vm-modules --test tests/gridpulse.test.js tests/dom-smoke.test.js tests/advisor.test.js tests/advisor-dom.test.js
+node --experimental-vm-modules --test tests/gridpulse.test.js tests/dom-smoke.test.js tests/advisor.test.js tests/advisor-dom.test.js tests/lab.test.js tests/lab-dom.test.js
 ```
 
 `npm test` is canonical, and all test suites must pass with zero failures.

@@ -1029,10 +1029,10 @@ export function applyDecodedBookmark(appState, decoded) {
 /* ------------------------------------------------------------------ */
 
 const LAB_COLORS = {
-  'unshifted-baseline': '#C92A2A',
-  'tou-delay-shift': '#0D7A5F',
+  'unshifted-baseline': '#B42323',
+  'tou-delay-shift': '#0A6B53',
   'comfort-safe-advisor': '#3E6EC2',
-  'battery-peak-shave': '#C8640A',
+  'battery-peak-shave': '#9A4A05',
   'critical-island-survival': '#11161B'
 };
 
@@ -1168,11 +1168,11 @@ export function renderSizingCurveSvg(appState = {}, labOptions = {}) {
 
   const target24 = yFor(24);
   const target48 = yFor(48);
-  let targets = `<line x1="${padLeft}" y1="${target24}" x2="${width - padRight}" y2="${target24}" stroke="#0D7A5F" stroke-dasharray="6 4" stroke-width="1.5" />`;
-  targets += `<text x="${width - padRight}" y="${target24 - 5}" text-anchor="end" fill="#0D7A5F" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10">24h outage target</text>`;
+  let targets = `<line x1="${padLeft}" y1="${target24}" x2="${width - padRight}" y2="${target24}" stroke="#0A6B53" stroke-dasharray="6 4" stroke-width="1.5" />`;
+  targets += `<text x="${width - padRight}" y="${target24 - 5}" text-anchor="end" fill="#0A6B53" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10">24h outage target</text>`;
   if (yMax >= 48) {
-    targets += `<line x1="${padLeft}" y1="${target48}" x2="${width - padRight}" y2="${target48}" stroke="#C8640A" stroke-dasharray="6 4" stroke-width="1.5" />`;
-    targets += `<text x="${width - padRight}" y="${target48 - 5}" text-anchor="end" fill="#C8640A" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10">48h outage target</text>`;
+    targets += `<line x1="${padLeft}" y1="${target48}" x2="${width - padRight}" y2="${target48}" stroke="#9A4A05" stroke-dasharray="6 4" stroke-width="1.5" />`;
+    targets += `<text x="${width - padRight}" y="${target48 - 5}" text-anchor="end" fill="#9A4A05" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10">48h outage target</text>`;
   }
 
   const polyline = entry.points.map((p) => `${xFor(p.kwh)},${yFor(p.enduranceHours)}`).join(' ');
@@ -1180,7 +1180,7 @@ export function renderSizingCurveSvg(appState = {}, labOptions = {}) {
     const cx = xFor(point.kwh);
     const cy = yFor(point.enduranceHours);
     const isActive = Math.abs(point.kwh - capacity) < 0.01;
-    return `<circle cx="${cx}" cy="${cy}" r="${isActive ? 7 : 5}" fill="${isActive ? '#C8640A' : '#0D7A5F'}" stroke="#FAF9F5" stroke-width="1.5"
+    return `<circle cx="${cx}" cy="${cy}" r="${isActive ? 7 : 5}" fill="${isActive ? '#9A4A05' : '#0A6B53'}" stroke="#FAF9F5" stroke-width="1.5"
       tabindex="0" role="button" data-lab-kwh="${point.kwh}"
       aria-label="Set battery to ${point.kwh} kWh, endurance ${point.enduranceHours} hours">
       <title>${point.kwh} kWh: ${point.enduranceHours}h island endurance</title>
@@ -1190,7 +1190,7 @@ export function renderSizingCurveSvg(appState = {}, labOptions = {}) {
   return `<svg class="lab-chart-svg" viewBox="0 0 ${width} ${height}" role="group" aria-label="LFP battery sizing curve of island endurance hours against capacity for the ${escapeXml(entry.policyName)} policy at ${sizing.reserveFloorPct} percent reserve floor">
   ${grid}
   ${targets}
-  <polyline fill="none" stroke="#0D7A5F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${polyline}" />
+  <polyline fill="none" stroke="#0A6B53" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${polyline}" />
   ${circles}
   <text x="${padLeft + plotW / 2}" y="${height - 8}" text-anchor="middle" fill="#3E4852" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10">LFP battery capacity kWh</text>
 </svg>`;

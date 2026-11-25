@@ -949,8 +949,8 @@ export function renderOscilloscopeSvgMarkup(simulation) {
   for (let t = 0; t <= maxKwScale; t += 5) yTicks.push(t);
   let gridLines = '';
   const busY = yForKw(PANEL_MAX_BUS_KW);
-  gridLines += `<line x1="${padLeft}" y1="${busY}" x2="${width - padRight}" y2="${busY}" stroke="#C92A2A" stroke-dasharray="2 4" stroke-width="1.25" />`;
-  gridLines += `<text x="${width - padRight}" y="${busY - 4}" text-anchor="end" fill="#C92A2A" font-family="JetBrains Mono, monospace" font-size="10">${PANEL_MAX_BUS_KW}kW BUS</text>`;
+  gridLines += `<line x1="${padLeft}" y1="${busY}" x2="${width - padRight}" y2="${busY}" stroke="#B42323" stroke-dasharray="2 4" stroke-width="1.25" />`;
+  gridLines += `<text x="${width - padRight}" y="${busY - 4}" text-anchor="end" fill="#B42323" font-family="JetBrains Mono, monospace" font-size="10">${PANEL_MAX_BUS_KW}kW BUS</text>`;
   for (const tick of yTicks) {
     const y = yForKw(tick);
     gridLines += `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="#CBC6B6" stroke-dasharray="3 3" stroke-width="1" />`;
@@ -974,23 +974,23 @@ export function renderOscilloscopeSvgMarkup(simulation) {
   return `<svg class="oscilloscope-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="24-hour ERCOT household demand curve comparing baseline peak draw with load-shifted profile">
     <defs>
       <linearGradient id="baseAreaFill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#C92A2A" stop-opacity="0.22" />
-        <stop offset="100%" stop-color="#C92A2A" stop-opacity="0.02" />
+        <stop offset="0%" stop-color="#B42323" stop-opacity="0.22" />
+        <stop offset="100%" stop-color="#B42323" stop-opacity="0.02" />
       </linearGradient>
       <linearGradient id="optAreaFill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0D7A5F" stop-opacity="0.28" />
-        <stop offset="100%" stop-color="#0D7A5F" stop-opacity="0.03" />
+        <stop offset="0%" stop-color="#0A6B53" stop-opacity="0.28" />
+        <stop offset="100%" stop-color="#0A6B53" stop-opacity="0.03" />
       </linearGradient>
     </defs>
     ${peakRects}
     ${gridLines}
     <polygon points="${baseArea}" fill="url(#baseAreaFill)" />
     <polygon points="${optArea}" fill="url(#optAreaFill)" />
-    <polyline fill="none" stroke="#C92A2A" stroke-width="2.25" stroke-dasharray="6 4" points="${basePolyline}" />
-    <polyline fill="none" stroke="#0D7A5F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${optPolyline}" />
+    <polyline fill="none" stroke="#B42323" stroke-width="2.25" stroke-dasharray="6 4" points="${basePolyline}" />
+    <polyline fill="none" stroke="#0A6B53" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${optPolyline}" />
     <line x1="${cursorX}" y1="${padTop}" x2="${cursorX}" y2="${padTop + plotH}" stroke="#11161B" stroke-width="1.5" />
-    <circle cx="${cursorX}" cy="${cursorBaseY}" r="4.5" fill="#C92A2A" stroke="#FAF9F5" stroke-width="1.5" />
-    <circle cx="${cursorX}" cy="${cursorOptY}" r="5.5" fill="#0D7A5F" stroke="#FAF9F5" stroke-width="1.5" />
+    <circle cx="${cursorX}" cy="${cursorBaseY}" r="4.5" fill="#B42323" stroke="#FAF9F5" stroke-width="1.5" />
+    <circle cx="${cursorX}" cy="${cursorOptY}" r="5.5" fill="#0A6B53" stroke="#FAF9F5" stroke-width="1.5" />
     ${xLabels}
   </svg>`;
 }

@@ -222,6 +222,8 @@ test('DOM Smoke 30: signal colors meet WCAG AA contrast on their tinted surfaces
   assert.ok(contrast(token('amber'), token('amber-wash')) >= 4.5, 'amber on amber wash below AA');
   assert.ok(contrast(token('emerald'), token('emerald-wash')) >= 4.5, 'emerald on emerald wash below AA');
   assert.ok(contrast(token('emerald'), token('panel')) >= 4.5, 'emerald on panel below AA');
+  assert.ok(contrast(token('vermilion'), token('vermilion-wash')) >= 4.5, 'vermilion on vermilion wash below AA');
+  assert.ok(contrast(token('vermilion'), token('panel')) >= 4.5, 'vermilion on panel below AA');
 });
 
 test('DOM Smoke 31: CSS body-control font sizes do not drop below 12px', () => {

@@ -104,10 +104,10 @@ To run the test suite (Node 18 or newer, no packages to install):
 npm test
 ```
 
-The canonical command is:
+The underlying command is:
 
 ```bash
-node --experimental-vm-modules --test tests/gridpulse.test.js tests/dom-smoke.test.js tests/advisor.test.js tests/advisor-dom.test.js
+node --experimental-vm-modules --test tests/gridpulse.test.js tests/dom-smoke.test.js tests/advisor.test.js tests/advisor-dom.test.js tests/lab.test.js tests/lab-dom.test.js
 ```
 
 The VM module flag is needed by one test helper that runs `js/app.js` against a
@@ -161,9 +161,9 @@ program or a hardware vendor, and nothing is electrical advice.
 
 MIT
 
-## November 22 local verification
+## Latest local verification
 
-385 Node tests passed, 0 failed, 0 skipped, 0 cancelled.
+402 Node tests passed, 0 failed, 0 skipped, 0 cancelled.
 
 `npm test` runs all six test files with
 `node --experimental-vm-modules --test`. Inputs and results are illustrative
@@ -181,4 +181,4 @@ controls and a `#gp=` reload restore of every encoded field.
 The footer no longer claims calibration to 15-minute settlement intervals.
 The implemented model uses hourly samples. The page identifies reserve,
 weather and tariff values as synthetic, removes a fixed battery-runtime
-promise, and updates the visible test count from 139 to 385.
+promise, and updates the visible test count from 139 to 402.
