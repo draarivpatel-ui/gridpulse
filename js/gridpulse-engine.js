@@ -341,8 +341,14 @@ export const HOUSEHOLD_CIRCUITS = [
 ];
 
 function roundTo(value, decimals) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return numeric;
   const factor = Math.pow(10, decimals);
-  return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
+  const scaled = (numeric + Number.EPSILON) * factor;
+  /* Values near the float ceiling overflow the scaling step; return them unrounded
+     rather than turning a finite input into Infinity. */
+  if (!Number.isFinite(scaled)) return numeric;
+  return Math.round(scaled) / factor;
 }
 
 function safeNumber(value, fallback = 0) {

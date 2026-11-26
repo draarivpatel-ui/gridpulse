@@ -648,6 +648,26 @@ describe('Winter Baseline Integrity & Safety Guards (Adversarial Regressions)', 
     assert.ok(negRes.hours >= 0 && negRes.minutes >= 0);
   });
 
+  it('53b. a near-ceiling finite capacity stays finite through rounding and the simulation', () => {
+    const res = calculateOutageBatteryEndurance({
+      activeCircuitsKw: 0.5,
+      batteryCapacityKwh: 1e308,
+      stateOfChargePct: 90,
+      solarOffsetKw: 0
+    });
+    assert.ok(Number.isFinite(res.batteryCapacityKwh));
+    assert.ok(Number.isFinite(res.usableKwh));
+    assert.ok(Number.isFinite(res.enduranceHoursDecimal));
+    assert.match(res.formattedDuration, /^\d+h \d{2}m$/);
+
+    const sim = simulateHouseholdGridPulse({
+      ...createInitialAppState(),
+      batteryCapacityKwh: 1e308
+    });
+    assert.ok(Number.isFinite(sim.outageEndurance.batteryCapacityKwh));
+    assert.ok(Number.isFinite(sim.outageEndurance.usableKwh));
+  });
+
   it('54. breaker directory renders protected critical circuits with a disabled switch', () => {
     const sim = simulateHouseholdGridPulse(createInitialAppState());
     const html = renderBreakerDirectoryMarkup(sim);
