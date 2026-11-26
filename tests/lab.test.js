@@ -8,6 +8,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
 
 import {
   BATTERY_DEFAULT_CAPACITY_KWH,
@@ -1248,6 +1249,12 @@ describe('Lab: accessibility semantics and cache integrity regressions', () => {
       assert.ok(svg.includes('role="group"'));
       assert.ok(svg.includes('role="button"'));
     }
+    const css = fs.readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+    assert.match(css, /input\[type="range"\]\s*\{[\s\S]*?min-height:\s*44px;[\s\S]*?border:\s*1px solid var\(--line-strong\);/);
+    assert.match(css, /\.scenario-btn\s*\{[\s\S]*?min-height:\s*44px;/);
+    assert.match(css, /\.lab-policy-picker label\s*\{[\s\S]*?min-height:\s*44px;/);
+    assert.match(css, /input\[type="radio"\]\s*\{[\s\S]*?border:\s*2px solid var\(--line-strong\);/);
+    assert.match(css, /circle\[role="button"\]\s*\{[\s\S]*?stroke-width:\s*34px;/);
   });
 
   it('144. cached stamped reports are deep-frozen against accidental mutation', () => {

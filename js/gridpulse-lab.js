@@ -1109,11 +1109,12 @@ export function renderTradeoffChartSvg(appState = {}, labOptions = {}) {
     const cy = yFor(point.y);
     const selected = point.policyId === opts.policyId;
     return `<g class="lab-point-group ${selected ? 'is-selected' : ''}">
-      <circle cx="${cx}" cy="${cy}" r="${selected ? 8 : 6}" fill="${color}" stroke="#FAF9F5" stroke-width="1.5"
+      <circle cx="${cx}" cy="${cy}" r="5" fill="transparent" stroke="transparent" stroke-width="44" vector-effect="non-scaling-stroke"
         tabindex="0" role="button" data-lab-policy-point="${point.policyId}"
         aria-label="Select ${escapeXml(point.policyName)} policy, ${point.y} kW peak shaved and ${point.x} hours island endurance">
         <title>${escapeXml(point.policyName)}: ${point.y} kW shaved, ${point.x}h island</title>
       </circle>
+      <circle cx="${cx}" cy="${cy}" r="${selected ? 8 : 6}" fill="${color}" stroke="#FAF9F5" stroke-width="1.5" pointer-events="none" aria-hidden="true"></circle>
       <text x="${cx}" y="${cy - 11}" text-anchor="middle" fill="#11161B" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="9">${escapeXml(point.policyName)}</text>
     </g>`;
   }).join('\n');
@@ -1180,11 +1181,11 @@ export function renderSizingCurveSvg(appState = {}, labOptions = {}) {
     const cx = xFor(point.kwh);
     const cy = yFor(point.enduranceHours);
     const isActive = Math.abs(point.kwh - capacity) < 0.01;
-    return `<circle cx="${cx}" cy="${cy}" r="${isActive ? 7 : 5}" fill="${isActive ? '#9A4A05' : '#0A6B53'}" stroke="#FAF9F5" stroke-width="1.5"
+    return `<circle cx="${cx}" cy="${cy}" r="5" fill="transparent" stroke="transparent" stroke-width="44" vector-effect="non-scaling-stroke"
       tabindex="0" role="button" data-lab-kwh="${point.kwh}"
       aria-label="Set battery to ${point.kwh} kWh, endurance ${point.enduranceHours} hours">
       <title>${point.kwh} kWh: ${point.enduranceHours}h island endurance</title>
-    </circle>`;
+    </circle><circle cx="${cx}" cy="${cy}" r="${isActive ? 7 : 5}" fill="${isActive ? '#9A4A05' : '#0A6B53'}" stroke="#FAF9F5" stroke-width="1.5" pointer-events="none" aria-hidden="true"></circle>`;
   }).join('\n');
 
   return `<svg class="lab-chart-svg" viewBox="0 0 ${width} ${height}" role="group" aria-label="LFP battery sizing curve of island endurance hours against capacity for the ${escapeXml(entry.policyName)} policy at ${sizing.reserveFloorPct} percent reserve floor">

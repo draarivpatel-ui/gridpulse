@@ -207,6 +207,7 @@ body {
 
 .scenario-btn {
   appearance: none;
+  min-height: 44px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--muted);
@@ -231,6 +232,7 @@ body {
 }
 
 .utility-print-btn {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -433,6 +435,7 @@ body {
 
 .primary-actuator-btn {
   width: 100%;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -464,6 +467,7 @@ body {
 }
 
 .sub-actuator-btn {
+  min-height: 44px;
   padding: 0.52rem 0.7rem;
   background-color: var(--surface);
   color: var(--ink);
@@ -692,10 +696,35 @@ body {
   border-radius: 3px;
 }
 
+input[type="radio"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  display: inline-grid;
+  place-content: center;
+  border: 2px solid var(--line-strong);
+  border-radius: 50%;
+  background-color: var(--surface);
+  cursor: pointer;
+}
+input[type="radio"]:checked::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--emerald);
+}
+
 input[type="range"] {
   width: 100%;
+  min-height: 44px;
   accent-color: var(--emerald);
   cursor: pointer;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background-color: var(--surface);
+  padding: 0 0.45rem;
 }
 
 .scrubber-readout-cells {
@@ -787,6 +816,7 @@ input[type="range"] {
 
 .solar-toggle-btn {
   width: 100%;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -931,6 +961,7 @@ input[type="range"] {
 .lab-controls input[type="range"] { width: 100%; }
 .lab-controls select {
   width: 100%;
+  min-height: 44px;
   font-family: var(--font-mono);
   font-size: 0.78rem;
   padding: 0.3rem 0.45rem;
@@ -956,6 +987,7 @@ input[type="range"] {
   padding: 0 0.4rem;
 }
 .lab-policy-picker label {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -1023,6 +1055,8 @@ input[type="range"] {
 }
 .lab-chart-svg circle[role="button"] {
   cursor: pointer;
+  stroke: rgba(0, 0, 0, 0);
+  stroke-width: 34px;
 }
 .lab-audit-bar {
   margin-top: 1.25rem;
@@ -1073,11 +1107,12 @@ input[type="range"] {
 }
 .lab-share-row input {
   flex: 1;
+  min-height: 44px;
   min-width: 0;
   font-family: var(--font-mono);
   font-size: 0.76rem;
   padding: 0.35rem 0.5rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-radius: 4px;
   background-color: var(--surface);
   color: var(--muted);
@@ -1284,6 +1319,7 @@ input[type="range"] {
 }
 
 .breaker-switch-btn {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
@@ -1321,6 +1357,7 @@ input[type="range"] {
 }
 
 .shift-relay-btn {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
