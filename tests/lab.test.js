@@ -664,6 +664,10 @@ describe('Lab: CSV escaping and export formats', () => {
     assert.equal(csvEscape('\t=x'), "'\t=x");
     assert.equal(csvEscape('\r=x'), '"\'\r=x"');
     assert.equal(csvEscape(' =x'), "' =x");
+    assert.equal(csvEscape('\u200B=x'), "'\u200B=x");
+    assert.equal(csvEscape('\u00A0+x'), "'\u00A0+x");
+    assert.equal(csvEscape(' \uFEFF@x'), "' \uFEFF@x");
+    assert.equal(csvEscape('\uFF1D2+2'), "'\uFF1D2+2");
   });
 
   it('66. commas, quotes and newlines escape to valid CSV cells', () => {
@@ -674,6 +678,7 @@ describe('Lab: CSV escaping and export formats', () => {
     assert.equal(csvEscape(null), '');
     assert.equal(csvEscape(undefined), '');
     assert.equal(csvEscape(13.5), '13.5');
+    assert.equal(csvEscape(-13.5), "'-13.5");
   });
 
   it('67. CSV export carries provenance header, digest and all 20 cells', () => {

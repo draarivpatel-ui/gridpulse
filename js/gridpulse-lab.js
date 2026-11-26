@@ -788,7 +788,7 @@ export function verifyStampedReport(stampedOrPayload) {
  */
 export function csvEscape(value) {
   let text = value === null || value === undefined ? '' : String(value);
-  if (/^\s*[=+\-@]/.test(text) || /^[\t\r\n]/.test(text)) {
+  if (/^[\s\p{Cf}\p{Cc}]*[=+\-@\t\r]/u.test(text.normalize('NFKC'))) {
     text = "'" + text;
   }
   if (/[",\n\r]/.test(text)) {
