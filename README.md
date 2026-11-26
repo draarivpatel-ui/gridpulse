@@ -163,7 +163,7 @@ MIT
 
 ## Latest local verification
 
-402 Node tests passed, 0 failed, 0 skipped, 0 cancelled.
+403 Node tests passed, 0 failed, 0 skipped, 0 cancelled.
 
 `npm test` runs all six test files with
 `node --experimental-vm-modules --test`. Inputs and results are illustrative
@@ -181,4 +181,4 @@ controls and a `#gp=` reload restore of every encoded field.
 The footer no longer claims calibration to 15-minute settlement intervals.
 The implemented model uses hourly samples. The page identifies reserve,
 weather and tariff values as synthetic, removes a fixed battery-runtime
-promise, and updates the visible test count from 139 to 402.
+promise, and updates the visible test count from 139 to 403.
